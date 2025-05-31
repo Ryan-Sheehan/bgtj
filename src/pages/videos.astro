@@ -1,0 +1,94 @@
+---
+import '../styles/global.css';
+import Layout from '../layouts/Layout.astro';
+import { getClient } from '../lib/sanityClient';
+import { videosQuery } from '../lib/queries';
+const videos = await getClient().fetch(videosQuery);
+
+type Video = { title: string; youtubeUrl: string }
+---
+
+<Layout>
+  <div class="videos-container">
+    <ul class="videos-list">
+      {videos.map((video: Video) => {
+        // Extract YouTube video ID from URL
+        let idMatch = video.youtubeUrl.match(/[?&]v=([^&#]+)/) || video.youtubeUrl.match(/youtu\.be\/([^?&#]+)/);
+        let videoId = idMatch ? idMatch[1] : '';
+        return (
+          <li class="video-item">
+            <div class="video-embed">
+              {videoId && (
+                <iframe
+                  src={`https://www.youtube.com/embed/${videoId}`}
+                  title={video.title}
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                  class="video-iframe"
+                ></iframe>
+              )}
+            </div>
+            <h2 class="video-title">{video.title}</h2>
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+</Layout>
+
+<style>
+.videos-title {
+  text-align: center;
+  margin: 2rem 0;
+  color: var(--color-text);
+}
+.videos-container {
+  width: 100%;
+  margin: 0 auto;
+  padding-left: 2vw;
+  padding-right: 2vw;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+.videos-list {
+  list-style: none;
+  padding: 0;
+}
+.video-item {
+  margin-bottom: 3rem;
+  width: 100%;
+}
+.video-embed {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.08);
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+.video-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.video-title {
+  margin: 1rem 0 0.5rem 0;
+  font-size: 1.3rem;
+  text-align: center;
+  color: var(--color-text);
+}
+@media (min-width: 700px) {
+  .videos-container {
+    max-width: 1100px;
+  }
+}
+</style> 

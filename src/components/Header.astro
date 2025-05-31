@@ -1,0 +1,52 @@
+<header class="header">
+  <nav class="header-nav">
+    <div class="nav-container">
+      <a href="/music">music</a>
+      <a href="/shows">shows</a>
+      <a href="/videos">videos</a>
+      <a href="/store">store</a>
+      <a href="/about">about</a>
+    </div>
+  </nav>
+  <style>
+    .header {
+      width: 100%;
+      padding: 1.2rem 0 1.2rem 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: var(--color-bg);
+      /* border-bottom: 1px solid var(--color-border); */
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      overflow-x: auto;
+      box-sizing: border-box;
+    }
+    .header-nav {
+      width: 100%;
+      overflow-x: auto;
+      box-sizing: border-box;
+    }
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 2.5rem;
+      width: 100%;
+      padding: 0 2.5vw;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+    .header a {
+      color: var(--color-text);
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      transition: color 0.2s;
+    }
+    .header a:hover {
+      color: #a0a0ff;
+    }
+  </style>
+</header> 

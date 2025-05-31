@@ -1,8 +1,8 @@
 import { createClient } from '@sanity/client'
 
-const projectId = import.meta.env.SANITY_PROJECT_ID
-const dataset = import.meta.env.SANITY_DATASET
-const apiVersion = import.meta.env.SANITY_API_VERSION
+const projectId = import.meta.env.SANITY_STUDIO_PROJECT_ID
+const dataset = import.meta.env.SANITY_STUDIO_DATASET
+const apiVersion = import.meta.env.SANITY_STUDIO_API_VERSION
 
 export const getClient = (previewToken?: string) =>
   createClient({
