@@ -1,0 +1,17 @@
+---
+export interface Props {
+  src: string | { src: string };
+  alt?: string;
+}
+const { src, alt = '' } = Astro.props;
+---
+<img src={typeof src === 'string' ? src : src.src} alt={alt} class="full-bleed-image" />
+<style>
+.full-bleed-image {
+  display: block;
+  width: 100vw;
+  max-width: 100vw;
+  margin: 0 calc(50% - 50vw);
+  object-fit: cover;
+}
+</style> 

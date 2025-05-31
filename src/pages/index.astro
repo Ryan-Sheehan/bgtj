@@ -1,9 +1,12 @@
 ---
 import LetterCanvas from '../components/LetterCanvas.astro';
 import Layout from '../layouts/Layout.astro';
+import FullBleedImage from '../components/FullBleedImage.astro';
+import familyUrl from '../assets/family.webp';
 
 ---
 
 <Layout>
 	<LetterCanvas />
+	<FullBleedImage src={familyUrl} alt="Family" />
 </Layout>
