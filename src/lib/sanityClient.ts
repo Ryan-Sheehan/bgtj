@@ -1,4 +1,5 @@
 import { createClient } from '@sanity/client'
+import imageUrlBuilder from '@sanity/image-url'
 
 const projectId = import.meta.env.SANITY_STUDIO_PROJECT_ID
 const dataset = import.meta.env.SANITY_STUDIO_DATASET
@@ -13,3 +14,6 @@ export const getClient = (previewToken?: string) =>
     token: previewToken,
     perspective: previewToken ? 'previewDrafts' : 'published',
   })
+
+export const urlFor = (source: any) =>
+  imageUrlBuilder({ projectId, dataset }).image(source)

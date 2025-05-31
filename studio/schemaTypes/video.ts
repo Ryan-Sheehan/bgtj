@@ -17,6 +17,11 @@ export default {
       type: 'url',
       title: 'YouTube Link',
       validation: (Rule: Rule) => Rule.uri({ scheme: ['https'] })
-    }
+    },
+    {
+      name: 'orderRank',
+      type: 'string',
+      hidden: true,
+    },
   ]
 } 

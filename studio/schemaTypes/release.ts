@@ -35,7 +35,7 @@ export default {
         Rule.custom((val, context) => {
           if ((context.parent as any)?.type === 'untitled') {
             if (!val) return 'Embed code or URL is required for Untitled embeds.'
-            if (!/^[\w-]{8,}$/.test(String(val))) return 'Could not extract embed code. Please check your input.'
+            if (!/^[\w-]{8,}$/i.test(String(val).trim())) return `Could not extract embed code from "${val}". Please check your input.`
             return true
           }
           return true
@@ -74,7 +74,13 @@ export default {
       title: 'Link Aggregator URL',
       hidden: (params: { parent: any }) => (params.parent as any)?.type !== 'release',
       validation: (Rule: Rule) =>
-        Rule.required().uri({ scheme: ['https', 'http'] }),
+        Rule.custom((val, context) => {
+          if ((context.parent as any)?.type === 'release') {
+            if (!val) return 'Link Aggregator URL is required for releases.'
+            if (!/^https?:\/\//.test(String(val))) return 'Link Aggregator URL must be a valid URL.'
+          }
+          return true
+        }),
     },
     {
       name: 'preRelease',
@@ -102,9 +108,9 @@ export default {
       type: 'type',
       title: 'title',
     },
-    prepare(selection: { type: string; title?: string }) {
+    prepare(value: Record<string, any>) {
       return {
-        title: selection.type === 'untitled' ? '[untitled] embed' : selection.title || 'Release',
+        title: value.type === 'untitled' ? '[untitled] embed' : value.title || 'Release',
       }
     },
   },
