@@ -1,11 +1,14 @@
+---
+const pathname = Astro.url?.pathname || '';
+---
 <header class="header">
   <nav class="header-nav">
     <div class="nav-container">
-      <a href="/music">music</a>
-      <a href="/shows">shows</a>
-      <a href="/videos">videos</a>
-      <a href="/store">store</a>
-      <a href="/about">about</a>
+      <a href="/music" class={pathname.startsWith('/music') ? 'active' : ''}>music</a>
+      <a href="/shows" class={pathname.startsWith('/shows') ? 'active' : ''}>shows</a>
+      <a href="/videos" class={pathname.startsWith('/videos') ? 'active' : ''}>videos</a>
+      <a href="/store" class={pathname.startsWith('/store') ? 'active' : ''}>store</a>
+      <a href="/about" class={pathname.startsWith('/about') ? 'active' : ''}>about</a>
     </div>
   </nav>
   <style>
@@ -44,6 +47,11 @@
       font-weight: 600;
       letter-spacing: 0.04em;
       transition: color 0.2s;
+      border-bottom: 2px solid transparent;
+      padding-bottom: 2px;
+    }
+    .header a.active {
+      border-bottom: 2px solid var(--color-text) !important;
     }
     .header a:hover {
       color: #a0a0ff;
