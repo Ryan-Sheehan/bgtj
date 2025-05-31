@@ -44,37 +44,18 @@
     const ctx = canvas.getContext('2d');
     const numLetters = letters.length;
     const aspectRatio = allImages[0][0].naturalHeight / allImages[0][0].naturalWidth;
-    let currentVariants = allImages.map(imgs => randomIndex(imgs.length));
-
-    function draw() {
-      const parent = canvas.parentElement;
-      const width = parent.offsetWidth;
-      const gapRatio = 0.12;
-      const totalGap = (numLetters - 1) * gapRatio;
-      const letterWidth = width / (numLetters + totalGap);
-      const gap = letterWidth * gapRatio;
-      const letterHeight = letterWidth * aspectRatio;
-      canvas.width = width;
-      canvas.height = letterHeight;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      allImages.forEach((imgs, i) => {
-        const img = imgs[currentVariants[i]];
-        const x = i * (letterWidth + gap);
-        ctx.drawImage(img, x, 0, letterWidth, letterHeight);
-      });
-    }
 
     // --- Dynamic behavior switching ---
     let cleanup = () => {};
     let timers = [];
-    let lastHoveredIndex = null;
+    let lastHovered = { row: null, col: null };
 
     function isMobile() {
       return !window.matchMedia('(pointer: fine)').matches || window.innerWidth <= 768;
     }
 
     function clearTimers() {
-      timers.forEach(id => clearTimeout(id));
+      timers.forEach(rowTimers => rowTimers && rowTimers.forEach(id => clearTimeout(id)));
       timers = [];
     }
 
@@ -83,57 +64,105 @@
       canvas.removeEventListener('mouseleave', handleMouseLeave);
     }
 
-    function handleMouseMove(e) {
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const width = canvas.width;
+    // We'll store currentVariants as a 2D array: [row][col]
+    let currentVariants = [];
+
+    function getLayout() {
+      const parent = canvas.parentElement;
+      const width = parent.offsetWidth;
+      const height = window.innerHeight;
       const gapRatio = 0.12;
-      const numLetters = letters.length;
       const totalGap = (numLetters - 1) * gapRatio;
       const letterWidth = width / (numLetters + totalGap);
       const gap = letterWidth * gapRatio;
+      const letterHeight = letterWidth * aspectRatio;
+      const numRows = Math.floor(height / letterHeight);
+      return { width, height, letterWidth, letterHeight, gap, numRows };
+    }
 
-      let hoveredIndex = null;
-      for (let i = 0; i < numLetters; i++) {
-        const startX = i * (letterWidth + gap);
+    function draw() {
+      const { width, height, letterWidth, letterHeight, gap, numRows } = getLayout();
+      canvas.width = width;
+      canvas.height = height;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let row = 0; row < numRows; row++) {
+        for (let col = 0; col < numLetters; col++) {
+          const img = allImages[col][currentVariants[row][col]];
+          const x = col * (letterWidth + gap);
+          const y = row * letterHeight;
+          ctx.drawImage(img, x, y, letterWidth, letterHeight);
+        }
+      }
+    }
+
+    function handleMouseMove(e) {
+      const { letterWidth, gap, letterHeight, numRows } = getLayout();
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      let hoveredCol = null;
+      let hoveredRow = null;
+      for (let col = 0; col < numLetters; col++) {
+        const startX = col * (letterWidth + gap);
         const endX = startX + letterWidth;
         if (x >= startX && x < endX) {
-          hoveredIndex = i;
+          hoveredCol = col;
           break;
         }
       }
-      if (hoveredIndex !== null && hoveredIndex !== lastHoveredIndex) {
-        currentVariants[hoveredIndex] = (currentVariants[hoveredIndex] + 1) % allImages[hoveredIndex].length;
+      for (let row = 0; row < numRows; row++) {
+        const startY = row * letterHeight;
+        const endY = startY + letterHeight;
+        if (y >= startY && y < endY) {
+          hoveredRow = row;
+          break;
+        }
+      }
+      if (
+        hoveredRow !== null &&
+        hoveredCol !== null &&
+        (hoveredRow !== lastHovered.row || hoveredCol !== lastHovered.col)
+      ) {
+        currentVariants[hoveredRow][hoveredCol] =
+          (currentVariants[hoveredRow][hoveredCol] + 1) % allImages[hoveredCol].length;
         draw();
       }
-      lastHoveredIndex = hoveredIndex;
+      lastHovered = { row: hoveredRow, col: hoveredCol };
     }
 
     function handleMouseLeave() {
-      lastHoveredIndex = null;
+      lastHovered = { row: null, col: null };
     }
 
-    function setRandomTimerForLetter(i) {
+    function setRandomTimerForLetter(row, col) {
       const minDelay = 1500;
       const maxDelay = 3500;
       const delay = Math.random() * (maxDelay - minDelay) + minDelay;
       const id = setTimeout(() => {
         let newVariant;
         do {
-          newVariant = randomIndex(allImages[i].length);
-        } while (newVariant === currentVariants[i] && allImages[i].length > 1);
-        currentVariants[i] = newVariant;
+          newVariant = randomIndex(allImages[col].length);
+        } while (newVariant === currentVariants[row][col] && allImages[col].length > 1);
+        currentVariants[row][col] = newVariant;
         draw();
-        setRandomTimerForLetter(i);
+        setRandomTimerForLetter(row, col);
       }, delay);
-      timers[i] = id;
+      timers[row][col] = id;
     }
 
     function setupBehavior() {
-      cleanup(); // Clean up previous listeners/timers
+      cleanup();
       clearTimers();
       removeDesktopListeners();
-      lastHoveredIndex = null;
+      lastHovered = { row: null, col: null };
+
+      // Recompute layout and initialize currentVariants and timers
+      const { numRows } = getLayout();
+      currentVariants = Array.from({ length: numRows }, () =>
+        letters.map((_, col) => randomIndex(allImages[col].length))
+      );
+      timers = Array.from({ length: numRows }, () => Array(numLetters).fill(null));
+
       if (!isMobile()) {
         canvas.addEventListener('mousemove', handleMouseMove);
         canvas.addEventListener('mouseleave', handleMouseLeave);
@@ -142,8 +171,10 @@
           canvas.removeEventListener('mouseleave', handleMouseLeave);
         };
       } else {
-        for (let i = 0; i < numLetters; i++) {
-          setRandomTimerForLetter(i);
+        for (let row = 0; row < numRows; row++) {
+          for (let col = 0; col < numLetters; col++) {
+            setRandomTimerForLetter(row, col);
+          }
         }
         cleanup = clearTimers;
       }
@@ -151,13 +182,13 @@
 
     // Use ResizeObserver for robust resize handling
     const resizeObserver = new window.ResizeObserver(() => {
-      draw();
       setupBehavior();
+      draw();
     });
     resizeObserver.observe(canvas.parentElement);
     window.addEventListener('orientationchange', () => {
-      draw();
       setupBehavior();
+      draw();
     });
 
     setupBehavior();
