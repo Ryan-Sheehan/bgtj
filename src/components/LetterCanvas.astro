@@ -1,0 +1,166 @@
+<canvas id="letters-canvas" style="display:block; margin: auto; width: 100%; height: auto;"></canvas>
+
+<script type="module">
+  const letters = [
+    { dir: '1-B', count: 9 },
+    { dir: '2-O', count: 10 },
+    { dir: '3-Y', count: 10 },
+    { dir: '4-S', count: 10 },
+    { dir: '5-G', count: 10 },
+    { dir: '6-O', count: 10 },
+    { dir: '7-T', count: 10 },
+    { dir: '8-O', count: 8 },
+    { dir: '9-J', count: 10 },
+    { dir: '10-U', count: 10 },
+    { dir: '11-P', count: 10 },
+    { dir: '12-I', count: 10 },
+    { dir: '13-T', count: 10 },
+    { dir: '14-E', count: 9 },
+    { dir: '15-R', count: 10 }
+  ];
+
+  function randomIndex(max) {
+    return Math.floor(Math.random() * max);
+  }
+
+  const allImages = letters.map(({ dir, count }) =>
+    Array.from({ length: count }, (_, i) => {
+      const img = new window.Image();
+      img.src = `/letters/${dir}/${i + 1}.png`;
+      return img;
+    })
+  );
+
+  Promise.all(
+    allImages.flat().map(
+      img =>
+        new Promise(resolve => {
+          if (img.complete) resolve();
+          else img.onload = resolve;
+        })
+    )
+  ).then(() => {
+    const canvas = document.getElementById('letters-canvas');
+    const ctx = canvas.getContext('2d');
+    const numLetters = letters.length;
+    const aspectRatio = allImages[0][0].naturalHeight / allImages[0][0].naturalWidth;
+    let currentVariants = allImages.map(imgs => randomIndex(imgs.length));
+
+    function draw() {
+      const parent = canvas.parentElement;
+      const width = parent.offsetWidth;
+      const gapRatio = 0.12;
+      const totalGap = (numLetters - 1) * gapRatio;
+      const letterWidth = width / (numLetters + totalGap);
+      const gap = letterWidth * gapRatio;
+      const letterHeight = letterWidth * aspectRatio;
+      canvas.width = width;
+      canvas.height = letterHeight;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      allImages.forEach((imgs, i) => {
+        const img = imgs[currentVariants[i]];
+        const x = i * (letterWidth + gap);
+        ctx.drawImage(img, x, 0, letterWidth, letterHeight);
+      });
+    }
+
+    // --- Dynamic behavior switching ---
+    let cleanup = () => {};
+    let timers = [];
+    let lastHoveredIndex = null;
+
+    function isMobile() {
+      return !window.matchMedia('(pointer: fine)').matches || window.innerWidth <= 768;
+    }
+
+    function clearTimers() {
+      timers.forEach(id => clearTimeout(id));
+      timers = [];
+    }
+
+    function removeDesktopListeners() {
+      canvas.removeEventListener('mousemove', handleMouseMove);
+      canvas.removeEventListener('mouseleave', handleMouseLeave);
+    }
+
+    function handleMouseMove(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const width = canvas.width;
+      const gapRatio = 0.12;
+      const numLetters = letters.length;
+      const totalGap = (numLetters - 1) * gapRatio;
+      const letterWidth = width / (numLetters + totalGap);
+      const gap = letterWidth * gapRatio;
+
+      let hoveredIndex = null;
+      for (let i = 0; i < numLetters; i++) {
+        const startX = i * (letterWidth + gap);
+        const endX = startX + letterWidth;
+        if (x >= startX && x < endX) {
+          hoveredIndex = i;
+          break;
+        }
+      }
+      if (hoveredIndex !== null && hoveredIndex !== lastHoveredIndex) {
+        currentVariants[hoveredIndex] = (currentVariants[hoveredIndex] + 1) % allImages[hoveredIndex].length;
+        draw();
+      }
+      lastHoveredIndex = hoveredIndex;
+    }
+
+    function handleMouseLeave() {
+      lastHoveredIndex = null;
+    }
+
+    function setRandomTimerForLetter(i) {
+      const minDelay = 1500;
+      const maxDelay = 3500;
+      const delay = Math.random() * (maxDelay - minDelay) + minDelay;
+      const id = setTimeout(() => {
+        let newVariant;
+        do {
+          newVariant = randomIndex(allImages[i].length);
+        } while (newVariant === currentVariants[i] && allImages[i].length > 1);
+        currentVariants[i] = newVariant;
+        draw();
+        setRandomTimerForLetter(i);
+      }, delay);
+      timers[i] = id;
+    }
+
+    function setupBehavior() {
+      cleanup(); // Clean up previous listeners/timers
+      clearTimers();
+      removeDesktopListeners();
+      lastHoveredIndex = null;
+      if (!isMobile()) {
+        canvas.addEventListener('mousemove', handleMouseMove);
+        canvas.addEventListener('mouseleave', handleMouseLeave);
+        cleanup = () => {
+          canvas.removeEventListener('mousemove', handleMouseMove);
+          canvas.removeEventListener('mouseleave', handleMouseLeave);
+        };
+      } else {
+        for (let i = 0; i < numLetters; i++) {
+          setRandomTimerForLetter(i);
+        }
+        cleanup = clearTimers;
+      }
+    }
+
+    // Use ResizeObserver for robust resize handling
+    const resizeObserver = new window.ResizeObserver(() => {
+      draw();
+      setupBehavior();
+    });
+    resizeObserver.observe(canvas.parentElement);
+    window.addEventListener('orientationchange', () => {
+      draw();
+      setupBehavior();
+    });
+
+    setupBehavior();
+    draw();
+  });
+</script> 

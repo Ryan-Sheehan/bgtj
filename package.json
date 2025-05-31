@@ -9,6 +9,10 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/vercel": "^8.1.4",
+    "@portabletext/react": "^3.2.1",
+    "@sanity/client": "^7.4.0",
+    "@sanity/preview-kit": "^6.1.1",
     "astro": "^5.8.1"
   }
 }

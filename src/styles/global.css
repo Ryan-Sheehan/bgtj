@@ -1,0 +1,65 @@
+@font-face {
+    font-family: 'MyFont';
+    src: url('/src/assets/fonts/MyFont-Regular.woff2') format('woff2'),
+         url('/src/assets/fonts/MyFont-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Ouvrieres Affamees';
+    src: url('/fonts/Ouvrieres-affamees.woff2') format('woff2'),
+         url('/fonts/Ouvrieres-affamees.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Ouvrieres Agricultirces';
+    src: url('/fonts/Ouvrieres-agricultrices.woff2') format('woff2'),
+         url('/fonts/Ouvrieres-agricultrices.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Ouvrieres Exploratrices';
+    src: url('/fonts/Ouvrieres-exploratrices.woff2') format('woff2'),
+         url('/fonts/Ouvrieres-exploratrices.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Ouvrieres Rassasiees';
+    src: url('/fonts/Ouvrieres-rassasiees.woff2') format('woff2'),
+         url('/fonts/Ouvrieres-rassasiees.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Ouvrieres Soldates';
+    src: url('/fonts/Ouvrieres-soldates.woff2') format('woff2'),
+         url('/fonts/Ouvrieres-soldates.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  body {
+    font-family: 'Ouvrieres Affamees', sans-serif;
+    background: #fff;
+    transition: background 0.3s;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      background: #18181b;
+    }
+  }
