@@ -6,7 +6,7 @@ interface ImportMetaEnv {
     readonly SANITY_API_VERSION: string;
     readonly SANITY_PREVIEW_TOKEN: string;
     readonly SANITY_PREVIEW_SECRET: string;
-
+    readonly ASTRO_DEV_TOOLBAR_ENABLED: string;
     // client-exposed
     readonly PUBLIC_SANITY_PROJECT_ID: string;
  }

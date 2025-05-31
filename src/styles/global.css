@@ -54,7 +54,7 @@
   
   body {
     font-family: 'Ouvrieres Affamees', sans-serif;
-    background: #fff;
+    background: var(--color-bg);
     transition: background 0.3s;
   }
 
@@ -63,3 +63,16 @@
       background: #18181b;
     }
   }
+
+:root {
+  --color-text: #18181b;
+  --color-border: #18181b;
+  --color-bg: #fff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text: #fff;
+    --color-border: #fff;
+    --color-bg: #18181b;
+  }
+}
