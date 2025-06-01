@@ -1,6 +1,6 @@
 import { orderableDocumentListDeskItem } from '@sanity/orderable-document-list'
 import { StructureBuilder } from 'sanity/structure'
-import { FiMusic, FiPlayCircle } from 'react-icons/fi'
+import { FiMusic, FiPlayCircle, FiUsers } from 'react-icons/fi'
 
 export default (S: StructureBuilder) =>
   S.list()
@@ -20,5 +20,13 @@ export default (S: StructureBuilder) =>
         S,
         context: S.context,
       }),
-      // Add other document types here if needed
+      S.divider(),
+      S.listItem()
+        .title('About')
+        .icon(FiUsers)
+        .child(
+          S.document()
+            .schemaType('about')
+            .documentId('about')
+        ),
     ]) 
