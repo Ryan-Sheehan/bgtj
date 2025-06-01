@@ -76,3 +76,12 @@
     --color-bg: #18181b;
   }
 }
+
+a {
+  color: var(--color-text) !important;
+  text-decoration: none !important;
+  transition: opacity 0.2s;
+}
+a:hover, a:focus {
+  opacity: 0.8;
+}

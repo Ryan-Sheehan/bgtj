@@ -4,15 +4,15 @@ import BgtjLogo from './BgtjLogo.astro';
 ---
 <header class="header">
   <nav class="header-nav">
-    <div class="nav-container">
+    <div class="nav-grid">
       <a href="/" class="logo-link" aria-label="Home">
         <BgtjLogo />
       </a>
-      <a href="/music" class={pathname.startsWith('/music') ? 'active' : ''}>music</a>
-      <a href="/shows" class={pathname.startsWith('/shows') ? 'active' : ''}>shows</a>
-      <a href="/videos" class={pathname.startsWith('/videos') ? 'active' : ''}>videos</a>
-      <a href="/store" class={pathname.startsWith('/store') ? 'active' : ''}>store</a>
-      <a href="/about" class={pathname.startsWith('/about') ? 'active' : ''}>about</a>
+      <a href="/music" class={pathname.startsWith('/music') ? 'active nav-link' : 'nav-link'}>music</a>
+      <a href="/shows" class={pathname.startsWith('/shows') ? 'active nav-link' : 'nav-link'}>shows</a>
+      <a href="/videos" class={pathname.startsWith('/videos') ? 'active nav-link' : 'nav-link'}>videos</a>
+      <a href="/store" class={pathname.startsWith('/store') ? 'active nav-link' : 'nav-link'}>store</a>
+      <a href="/about" class={pathname.startsWith('/about') ? 'active nav-link' : 'nav-link'}>about</a>
     </div>
   </nav>
   <style>
@@ -35,27 +35,32 @@ import BgtjLogo from './BgtjLogo.astro';
       overflow-x: auto;
       box-sizing: border-box;
     }
-    .nav-container {
-      display: flex;
-      justify-content: space-between;
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(15, 1fr);
       align-items: center;
-      gap: 2.5rem;
+      gap: 0;
       width: 100%;
       padding: 0 2.5vw;
       min-width: 0;
       box-sizing: border-box;
     }
     .logo-link {
+      grid-column: 1 / 6;
       display: flex;
       align-items: center;
-      margin-right: 1.5rem;
+      margin-right: 0;
+      justify-self: start;
     }
     .header-logo {
       height: 2.2rem;
       width: auto;
       display: block;
     }
-    .header a {
+    .nav-link {
+      display: block;
+      grid-column-end: span 2;
+      text-align: right;
       color: var(--color-text);
       text-decoration: none;
       font-size: 1.1rem;
@@ -64,12 +69,33 @@ import BgtjLogo from './BgtjLogo.astro';
       transition: color 0.2s;
       border-bottom: 2px solid transparent;
       padding-bottom: 2px;
+      align-self: center;
+      justify-self: end;
     }
-    .header a.active {
+    .nav-link.active {
       border-bottom: 2px solid var(--color-text) !important;
     }
-    .header a:hover {
+    .nav-link:hover {
       color: #a0a0ff;
+    }
+    @media (max-width: 900px) {
+      .nav-grid {
+        grid-template-columns: repeat(15, 1fr);
+        gap: 0;
+      }
+    }
+    @media (max-width: 700px) {
+      .nav-grid {
+        grid-template-columns: repeat(15, 1fr);
+        padding: 0 1vw;
+      }
+      .logo-link {
+        grid-column: 1 / 8;
+      }
+      .nav-link {
+        font-size: 1rem;
+        padding-bottom: 1px;
+      }
     }
   </style>
 </header> 
