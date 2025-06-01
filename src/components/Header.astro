@@ -1,9 +1,13 @@
 ---
 const pathname = Astro.url?.pathname || '';
+import BgtjLogo from './BgtjLogo.astro';
 ---
 <header class="header">
   <nav class="header-nav">
     <div class="nav-container">
+      <a href="/" class="logo-link" aria-label="Home">
+        <BgtjLogo />
+      </a>
       <a href="/music" class={pathname.startsWith('/music') ? 'active' : ''}>music</a>
       <a href="/shows" class={pathname.startsWith('/shows') ? 'active' : ''}>shows</a>
       <a href="/videos" class={pathname.startsWith('/videos') ? 'active' : ''}>videos</a>
@@ -34,11 +38,22 @@ const pathname = Astro.url?.pathname || '';
     .nav-container {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       gap: 2.5rem;
       width: 100%;
       padding: 0 2.5vw;
       min-width: 0;
       box-sizing: border-box;
+    }
+    .logo-link {
+      display: flex;
+      align-items: center;
+      margin-right: 1.5rem;
+    }
+    .header-logo {
+      height: 2.2rem;
+      width: auto;
+      display: block;
     }
     .header a {
       color: var(--color-text);
