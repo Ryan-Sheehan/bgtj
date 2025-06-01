@@ -68,12 +68,18 @@
   --color-text: #18181b;
   --color-border: #18181b;
   --color-bg: #fff;
+  --header-height: 4.4rem;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --color-text: #fff;
     --color-border: #fff;
     --color-bg: #18181b;
+  }
+}
+@media (max-width: 700px) {
+  :root {
+    --header-height: 3.2rem;
   }
 }
 

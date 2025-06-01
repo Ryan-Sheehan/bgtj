@@ -23,7 +23,7 @@ const { embedCode } = Astro.props;
   grid-column: 3 / 14;
   width: 100%;
   max-width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh - var(--header-height));
   display: flex;
   align-items: center;
   justify-content: center;
