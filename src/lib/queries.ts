@@ -4,7 +4,7 @@ export const postQuery = `*[_type == "post" && slug.current == $slug][0] {
     body
   }`
 
-export const videosQuery = `*[_type == "video"] | order(_createdAt desc) {
+export const videosQuery = `*[_type == "video"] | order(orderRank asc) {
   _id,
   title,
   youtubeUrl
