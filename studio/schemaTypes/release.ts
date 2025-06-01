@@ -101,6 +101,7 @@ export default {
       name: 'orderRank',
       type: 'string',
       hidden: true,
+      initialValue: 'last',
     },
   ],
   preview: {
