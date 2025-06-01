@@ -1,80 +1,45 @@
 ---
 import { urlFor } from '../lib/sanityClient';
-export interface Props {
-  type: 'release' | 'untitled';
-  embedCode?: string;
-  title?: string;
-  artwork?: any;
-  linkAggregator?: string;
-}
-const { type, embedCode, title, artwork, linkAggregator } = Astro.props;
+const { title, artwork, linkAggregator } = Astro.props;
 ---
-{type === 'untitled' ? (
-  <div class="release-embed-container">
-    <iframe
-      style="border-radius: 24px"
-      src={`https://untitled.stream/embed/${embedCode}`}
-      width="100%"
-      height="344"
-      allowfullscreen
-      allow="picture-in-picture"
-      frameborder="0"
-      loading="lazy"
-      class="release-embed"
-    ></iframe>
-  </div>
-) : (
-  <div class="release-main-container">
-    <h1 class="release-title">{title}</h1>
-    {artwork && (
-      <img src={urlFor(artwork).width(800).height(800).fit('crop').url()} alt={title} class="release-artwork" />
-    )}
-    {linkAggregator && (
-      <a href={linkAggregator} class="release-listen-btn" target="_blank" rel="noopener noreferrer">Listen</a>
-    )}
-  </div>
-)}
+<div class="release-row">
+  <h1 class="release-title">{title}</h1>
+  {artwork && (
+    <img src={urlFor(artwork).width(800).height(800).fit('crop').url()} alt={title} class="release-artwork" />
+  )}
+  {linkAggregator && (
+    <a href={linkAggregator} class="release-listen-btn" target="_blank" rel="noopener noreferrer">Listen</a>
+  )}
+</div>
 <style>
-.release-embed-container {
-  min-height: 100vh;
-  display: flex;
+.release-row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  justify-items: center;
   align-items: center;
-  justify-content: center;
-  width: 100vw;
-}
-.release-embed {
-  max-width: 600px;
   width: 100%;
-  min-width: 320px;
-  border: none;
-  background: transparent;
-}
-.release-main-container {
+  max-width: 100%;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100vw;
-  padding: 2rem 0;
 }
 .release-title {
-  font-size: 2rem;
-  margin-bottom: 2rem;
-  color: var(--color-text);
+  grid-column: 6 / 11;
   text-align: center;
+  color: var(--color-text);
 }
 .release-artwork {
-  width: min(60vw, 400px);
-  height: min(60vw, 400px);
+  grid-column: 6 / 11;
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 1/1;
   object-fit: cover;
   border-radius: 16px;
   box-shadow: 0 2px 16px 0 rgba(0,0,0,0.08);
   margin-bottom: 2rem;
-  aspect-ratio: 1/1;
   background: var(--color-bg);
 }
 .release-listen-btn {
+  grid-column: 7 / 10;
   display: inline-block;
   padding: 0.9rem 2.2rem;
   font-size: 1.1rem;
@@ -85,6 +50,7 @@ const { type, embedCode, title, artwork, linkAggregator } = Astro.props;
   text-decoration: none;
   transition: background 0.2s;
   box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+  text-align: center;
 }
 .release-listen-btn:hover {
   background: #4444ff;

@@ -25,7 +25,9 @@ import Header from '../components/Header.astro';
 	<body>
 		<Header />
 		<main style="min-height: 100vh; display: flex; flex-direction: column;">
-			<slot />
+			<div class="main-grid">
+				<slot />
+			</div>
 		</main>
 	</body>
 </html>
@@ -38,5 +40,12 @@ import Header from '../components/Header.astro';
 		height: 100%;
 		min-height: 100vh;
 		/* overflow: hidden; */
+	}
+	.main-grid {
+		display: grid;
+		grid-template-columns: repeat(15, 1fr);
+		width: 100%;
+		padding: 0 2.5vw;
+		box-sizing: border-box;
 	}
 </style>

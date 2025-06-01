@@ -1,26 +1,27 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Release from '../components/Release.astro';
+import UntitledEmbed from '../components/UntitledEmbed.astro';
 import { getClient } from '../lib/sanityClient';
 import { releasesQuery } from '../lib/queries';
 const releases = await getClient().fetch(releasesQuery);
 ---
 
 <Layout>
-  <div class="music-releases">
-    {releases.map((release) => (
-      <Release {...release} />
-    ))}
-  </div>
+  {releases.map(release => (
+    <>
+      {release.type === 'untitled' ? (
+        <UntitledEmbed {...release} />
+      ) : (
+        <Release {...release} />
+      )}
+    </>
+  ))}
 </Layout>
 
 <style>
-.music-releases {
-  width: 100vw;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
+.music-row {
+  grid-column: 1 / -1;
+  display: contents;
 }
 </style> 
