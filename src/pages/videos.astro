@@ -22,7 +22,7 @@ type Video = { title: string; youtubeUrl: string }
                 <iframe
                   src={`https://www.youtube.com/embed/${videoId}`}
                   title={video.title}
-                  frameborder="0"
+                  style="border: none;"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowfullscreen
                   class="video-iframe"

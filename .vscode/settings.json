@@ -1,0 +1,12 @@
+{
+  "typescript.preferences.strictFunctionTypes": true,
+  "typescript.preferences.noSemicolons": "ignore",
+  "typescript.format.semicolons": "ignore",
+  "astro.trace.server": "messages",
+  "files.associations": {
+    "*.astro": "astro"
+  },
+  "emmet.includeLanguages": {
+    "astro": "html"
+  }
+} 

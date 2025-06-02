@@ -1,5 +1,5 @@
 import { orderableDocumentListDeskItem } from '@sanity/orderable-document-list'
-import { StructureBuilder } from 'sanity/structure'
+import type { StructureBuilder } from 'sanity/structure'
 import { FiMusic, FiPlayCircle, FiUsers } from 'react-icons/fi'
 
 export default (S: StructureBuilder) =>

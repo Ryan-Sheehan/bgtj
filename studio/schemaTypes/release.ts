@@ -1,4 +1,4 @@
-import { Rule } from 'sanity'
+import type { Rule } from 'sanity'
 import { FiMusic } from 'react-icons/fi'
 import EmbedCodeInput from '../components/EmbedCodeInput'
 

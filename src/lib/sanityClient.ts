@@ -11,7 +11,7 @@ export const getClient = (previewToken?: string) =>
     dataset,
     apiVersion,
     useCdn: !previewToken, // disable CDN for previews
-    token: previewToken,
+    ...(previewToken && { token: previewToken }),
     perspective: previewToken ? 'previewDrafts' : 'published',
   })
 
