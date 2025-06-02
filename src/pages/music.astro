@@ -4,12 +4,13 @@ import Release from '../components/Release.astro';
 import UntitledEmbed from '../components/UntitledEmbed.astro';
 import { getClient } from '../lib/sanityClient';
 import { releasesQuery } from '../lib/queries';
+import type { Release as ReleaseType } from '../types/sanity';
 
-const releases = await getClient().fetch(releasesQuery);
+const releases: ReleaseType[] = await getClient().fetch(releasesQuery);
 ---
 
 <Layout>
-  {releases.map((release: any) => (
+  {releases.map((release: ReleaseType) => (
     <>
       {release.type === 'untitled' ? (
         <UntitledEmbed {...release} />

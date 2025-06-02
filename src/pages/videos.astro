@@ -3,9 +3,9 @@ import '../styles/global.css';
 import Layout from '../layouts/Layout.astro';
 import { getClient } from '../lib/sanityClient';
 import { videosQuery } from '../lib/queries';
-const videos = await getClient().fetch(videosQuery);
+import type { Video } from '../types/sanity';
 
-type Video = { title: string; youtubeUrl: string }
+const videos: Video[] = await getClient().fetch(videosQuery);
 ---
 
 <Layout>
