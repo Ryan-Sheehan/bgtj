@@ -161,17 +161,33 @@
       timers[row][col] = id;
     }
 
+    function initializeVariants(numRows) {
+      if (currentVariants.length === 0) {
+        // Only initialize if we haven't already
+        currentVariants = Array.from({ length: numRows }, () =>
+          letters.map((_, col) => randomIndex(allImages[col].length))
+        );
+      } else if (currentVariants.length < numRows) {
+        // Add new rows if needed
+        const newRows = Array.from({ length: numRows - currentVariants.length }, () =>
+          letters.map((_, col) => randomIndex(allImages[col].length))
+        );
+        currentVariants = [...currentVariants, ...newRows];
+      } else if (currentVariants.length > numRows) {
+        // Remove extra rows if needed
+        currentVariants = currentVariants.slice(0, numRows);
+      }
+    }
+
     function setupBehavior() {
       cleanup();
       clearTimers();
       removeDesktopListeners();
       lastHovered = { row: null, col: null };
 
-      // Recompute layout and initialize currentVariants and timers
+      // Recompute layout and update currentVariants if needed
       const { numRows } = getLayout();
-      currentVariants = Array.from({ length: numRows }, () =>
-        letters.map((_, col) => randomIndex(allImages[col].length))
-      );
+      initializeVariants(numRows);
       timers = Array.from({ length: numRows }, () => Array(numLetters).fill(null));
 
       if (!isMobile()) {
