@@ -18,4 +18,12 @@ export const releasesQuery = `*[_type == 'release'] | order(orderRank) {
   artwork,
   linkAggregator
 }`
+
+export const aboutQuery = `*[_type == "about"][0] {
+  content
+}`
+
+export const storeQuery = `*[_type == "store"][0] {
+  storeLink
+}`
   

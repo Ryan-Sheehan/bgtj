@@ -1,6 +1,6 @@
 import { orderableDocumentListDeskItem } from '@sanity/orderable-document-list'
 import type { StructureBuilder } from 'sanity/structure'
-import { FiMusic, FiPlayCircle, FiUsers } from 'react-icons/fi'
+import { FiMusic, FiPlayCircle, FiUsers, FiShoppingBag } from 'react-icons/fi'
 
 export default (S: StructureBuilder) =>
   S.list()
@@ -28,5 +28,15 @@ export default (S: StructureBuilder) =>
           S.document()
             .schemaType('about')
             .documentId('about')
+            .title('About')
+        ),
+      S.listItem()
+        .title('Store')
+        .icon(FiShoppingBag)
+        .child(
+          S.document()
+            .schemaType('store')
+            .documentId('store')
+            .title('Store')
         ),
     ]) 

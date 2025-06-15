@@ -1,5 +1,6 @@
 import { createClient } from '@sanity/client'
 import imageUrlBuilder from '@sanity/image-url'
+import { aboutQuery, storeQuery } from './queries'
 
 const projectId = import.meta.env.SANITY_STUDIO_PROJECT_ID
 const dataset = import.meta.env.SANITY_STUDIO_DATASET
@@ -17,3 +18,13 @@ export const getClient = (previewToken?: string) =>
 
 export const urlFor = (source: any) =>
   imageUrlBuilder({ projectId, dataset }).image(source)
+
+export async function getAbout() {
+  const client = getClient()
+  return client.fetch(aboutQuery)
+}
+
+export async function getStore() {
+  const client = getClient()
+  return client.fetch(storeQuery)
+}
