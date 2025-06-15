@@ -19,6 +19,7 @@
     "@sanity/preview-kit": "^6.1.1",
     "astro": "^5.8.1",
     "framer-motion": "^12.15.0",
+    "sharp": "^0.34.2",
     "typescript": "^5.8.3"
   },
   "devDependencies": {

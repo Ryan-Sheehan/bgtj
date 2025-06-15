@@ -37,7 +37,7 @@
   const allImages = letters.map(({ dir, count }) =>
     Array.from({ length: count }, (_, i) => {
       const img = new window.Image();
-      img.src = `/letters/${dir}/${i + 1}.png`;
+      img.src = `/letters/${dir}/${i + 1}.webp`;
       return img;
     })
   );
