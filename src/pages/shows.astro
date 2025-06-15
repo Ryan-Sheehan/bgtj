@@ -1,0 +1,27 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Shows">
+  <div class="shows-container">
+    <div id="seated-55fdf2c0" data-artist-id="ccba1ffa-1810-4ae9-9102-daa2be1a026b" data-css-version="3"></div>
+  </div>
+</Layout>
+
+<style>
+  .shows-container {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 500px;
+  }
+</style>
+
+<script>
+  // Load Seated widget script
+  document.addEventListener('DOMContentLoaded', () => {
+    const script = document.createElement('script');
+    script.src = 'https://widget.seated.com/app.js';
+    script.async = true;
+    document.body.appendChild(script);
+  });
+</script> 
