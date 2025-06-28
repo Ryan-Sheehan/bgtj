@@ -26,7 +26,7 @@ import Layout from '../layouts/Layout.astro';
 .shows-content :global(.seated-widget) {
   background: transparent !important;
   color: var(--color-text) !important;
-  font-family: 'Ouvrieres Affamees', sans-serif !important;
+  font-family: 'Courier Prime', monospace !important;
 }
 
 .shows-content :global(.seated-event) {
@@ -38,23 +38,35 @@ import Layout from '../layouts/Layout.astro';
 /* ===== TEXT CONTENT STYLING ===== */
 .shows-content :global(.seated-event-date) {
   color: var(--color-text) !important;
-  font-weight: 600 !important;
+  font-family: 'Smokum', serif !important;
+  font-weight: 400 !important;
+  text-transform: uppercase !important;
+  font-size: 1.1rem !important;
 }
 
 .shows-content :global(.seated-event-venue) {
   color: var(--color-text) !important;
+  font-family: 'Courier Prime', monospace !important;
+  font-weight: 400 !important;
+  text-transform: uppercase !important;
   opacity: 0.8;
 }
 
 .shows-content :global(.seated-event-location) {
   color: var(--color-text) !important;
+  font-family: 'Courier Prime', monospace !important;
+  font-weight: 400 !important;
+  text-transform: uppercase !important;
   opacity: 0.7;
 }
 
 .shows-content :global(.seated-no-events) {
   color: var(--color-text) !important;
+  font-family: 'Courier Prime', monospace !important;
+  font-weight: 400 !important;
   text-align: center !important;
   font-size: 1.25rem !important;
+  text-transform: uppercase !important;
   padding: 3rem 0 !important;
   opacity: 0.7;
 }
@@ -69,6 +81,9 @@ import Layout from '../layouts/Layout.astro';
   background: transparent !important;
   background-color: transparent !important;
   color: var(--color-text) !important;
+  font-family: 'Courier Prime', monospace !important;
+  font-weight: 400 !important;
+  text-transform: uppercase !important;
   border-color: var(--color-text) !important;
   border-width: 1px !important;
   border-radius: 0 !important;
@@ -171,6 +186,19 @@ import Layout from '../layouts/Layout.astro';
 .shows-content :global(a),
 .shows-content :global(button) {
   color: var(--color-text) !important;
+  font-family: 'Courier Prime', monospace !important;
+}
+
+/* ===== TITLE ELEMENTS ===== */
+.shows-content :global(h1),
+.shows-content :global(h2),
+.shows-content :global(h3),
+.shows-content :global(.seated-event-title),
+.shows-content :global(.seated-title) {
+  color: var(--color-text) !important;
+  font-family: 'Smokum', serif !important;
+  font-weight: 400 !important;
+  text-transform: uppercase !important;
 }
 
 /* ===== RESPONSIVE ADJUSTMENTS ===== */
