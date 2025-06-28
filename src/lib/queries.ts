@@ -26,4 +26,11 @@ export const aboutQuery = `*[_type == "about"][0] {
 export const storeQuery = `*[_type == "store"][0] {
   storeLink
 }`
+
+export const settingsQuery = `*[_type == "settings" && _id == "settings"][0] {
+  mailingList {
+    title,
+    description
+  }
+}`
   

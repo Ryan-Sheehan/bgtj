@@ -45,4 +45,12 @@ export interface Post {
     current: string;
   };
   body: any; // This would be PortableText content
+}
+
+// Settings type
+export interface Settings {
+  mailingList?: {
+    title?: string;
+    description?: string;
+  };
 } 

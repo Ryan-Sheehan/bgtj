@@ -1,0 +1,158 @@
+---
+export interface Props {
+	title?: string;
+	description?: string;
+}
+
+const { title = 'Stay Updated', description = 'Get the latest news and updates from Boys Go To Jupiter' } = Astro.props;
+---
+
+<footer class="footer">
+	<div class="footer-content">
+		<div class="footer-newsletter">
+			<h3 class="newsletter-title">{title}</h3>
+			<p class="newsletter-description">{description}</p>
+			<div data-supascribe-embed-id="572252791967" data-supascribe-subscribe class="newsletter-embed"></div>
+		</div>
+	</div>
+</footer>
+
+<style>
+	/* ===== FOOTER STYLING ===== */
+	.footer {
+		background: var(--color-bg);
+		margin-top: 4rem;
+		padding: 4rem 0 5rem 0;
+		overflow: visible;
+	}
+	
+	.footer-content {
+		display: grid;
+		grid-template-columns: repeat(14, 1fr);
+		width: 100%;
+		padding: 0 2.5vw;
+		box-sizing: border-box;
+		overflow: visible;
+	}
+	
+	.footer-newsletter {
+		grid-column: 2 / -2;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		max-width: 500px;
+		margin: 0 auto;
+		width: 100%;
+		overflow: visible;
+		min-height: auto;
+	}
+	
+	.newsletter-title {
+		font-size: clamp(2rem, 4vw, 2.5rem);
+		font-weight: 700;
+		color: var(--color-text);
+		margin: 0 0 1rem 0;
+		text-transform: uppercase;
+		letter-spacing: -0.01em;
+	}
+	
+	.newsletter-description {
+		font-size: 1.125rem;
+		color: var(--color-text);
+		opacity: 0.8;
+		margin: 0 0 2rem 0;
+		line-height: 1.4;
+	}
+	
+	.newsletter-embed {
+		width: 100%;
+		max-width: 400px;
+		overflow: visible;
+		padding-bottom: 1rem;
+	}
+	
+	/* Override Supascribe styles to match site design */
+	:global([data-supascribe-subscribe]) {
+		background: transparent !important;
+		border: none !important;
+		font-family: 'Ouvrieres Affamees', sans-serif !important;
+		overflow: visible !important;
+		height: auto !important;
+		min-height: auto !important;
+		max-height: none !important;
+		position: relative !important;
+	}
+	
+	:global([data-supascribe-subscribe] *) {
+		overflow: visible !important;
+		height: auto !important;
+		min-height: auto !important;
+		max-height: none !important;
+	}
+	
+	:global([data-supascribe-subscribe] input) {
+		background: transparent !important;
+		border: 1px solid var(--color-text) !important;
+		border-radius: 0 !important;
+		color: var(--color-text) !important;
+		padding: 0.75rem 1rem !important;
+		font-size: 1rem !important;
+		font-family: 'Ouvrieres Affamees', sans-serif !important;
+		width: 100% !important;
+		box-sizing: border-box !important;
+	}
+	
+	:global([data-supascribe-subscribe] input::placeholder) {
+		color: var(--color-text) !important;
+		opacity: 0.6 !important;
+	}
+	
+	:global([data-supascribe-subscribe] button) {
+		background: transparent !important;
+		border: 1px solid var(--color-text) !important;
+		border-radius: 0 !important;
+		color: var(--color-text) !important;
+		padding: 0.75rem 1.5rem !important;
+		font-size: 1rem !important;
+		font-weight: 600 !important;
+		font-family: 'Ouvrieres Affamees', sans-serif !important;
+		text-transform: uppercase !important;
+		letter-spacing: 0.025em !important;
+		cursor: pointer !important;
+		transition: opacity 0.2s ease !important;
+		margin-top: 1rem !important;
+		margin-bottom: 1rem !important;
+		box-sizing: border-box !important;
+	}
+	
+	:global([data-supascribe-subscribe] button:hover) {
+		opacity: 0.8 !important;
+	}
+	
+	:global([data-supascribe-subscribe] *) {
+		color: var(--color-text) !important;
+	}
+	
+	/* Responsive adjustments */
+	@media (max-width: 768px) {
+		.footer-newsletter {
+			grid-column: 1 / -1;
+		}
+		
+		.newsletter-title {
+			font-size: clamp(1.5rem, 6vw, 2rem);
+		}
+		
+		.newsletter-description {
+			font-size: 1rem;
+		}
+	}
+	
+	@media (max-width: 480px) {
+		.footer {
+			margin-top: 2rem;
+			padding: 2rem 0;
+		}
+	}
+</style> 
