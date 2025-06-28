@@ -4,7 +4,6 @@ import vercel from '@astrojs/vercel'
 import react from '@astrojs/react'
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
 import { visualizer } from 'rollup-plugin-visualizer'
-import compression from 'vite-plugin-compression'
 import { checker } from 'vite-plugin-checker'
 import eslint from '@nabla/vite-plugin-eslint'
 
@@ -32,18 +31,6 @@ export default defineConfig({
         open: false,
         gzipSize: true,
         brotliSize: true,
-      }),
-      
-      // Asset compression
-      compression({
-        algorithm: 'brotliCompress',
-        ext: '.br',
-        threshold: 1024,
-      }),
-      compression({
-        algorithm: 'gzip',
-        ext: '.gz',
-        threshold: 1024,
       }),
       
       // Development tools
