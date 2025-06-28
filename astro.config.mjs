@@ -14,17 +14,19 @@ export default defineConfig({
   adapter: vercel(),
   vite: {
     plugins: [
-      // Image optimization
-      ViteImageOptimizer({
-        png: { quality: 85 },
-        jpeg: { quality: 85 },
-        jpg: { quality: 85 },
-        webp: { quality: 85 },
-        cache: true,
-        includePublic: true,
-        logStats: true,
-        exclude: ['_astro/**'],
-      }),
+      // Image optimization (disabled on Vercel to prevent build timeouts)
+      ...(process.env.VERCEL ? [] : [
+        ViteImageOptimizer({
+          png: { quality: 85 },
+          jpeg: { quality: 85 },
+          jpg: { quality: 85 },
+          webp: { quality: 85 },
+          cache: true,
+          includePublic: true,
+          logStats: true,
+          exclude: ['_astro/**'],
+        })
+      ]),
       
       // Bundle analysis
       visualizer({
