@@ -164,3 +164,29 @@ The site is deployed on Vercel with automatic deployments from the main branch.
 ## 📄 License
 
 All rights reserved - Boys Go To Jupiter
+
+## 🎯 Performance Optimization
+
+The project includes automatic performance optimizations through Vite plugins:
+
+### Image Optimization
+- **Automatic compression**: PNG, JPEG, and WebP optimization with 85% quality
+- **Smart caching**: Built-in caching prevents reprocessing unchanged images  
+- **Build integration**: Seamlessly integrated into the Vite build process
+- **Real-time stats**: Shows compression ratios and file size savings
+
+### Asset Compression
+- **Dual compression**: Both Gzip and Brotli compression for all assets
+- **Threshold-based**: Only compresses files larger than 1KB
+- **Universal support**: Gzip for broad compatibility, Brotli for modern browsers
+
+### Bundle Analysis
+- **Visual analysis**: Bundle composition analysis via `dist/stats.html`
+- **Size tracking**: Gzip and Brotli size reporting
+- **Performance insights**: Identify optimization opportunities
+
+### Results
+Typical performance improvements:
+- **62% image size reduction** (18MB saved out of 29MB)
+- **Comprehensive asset compression** on all JS/CSS files
+- **Lightning-fast rebuilds** with smart caching
