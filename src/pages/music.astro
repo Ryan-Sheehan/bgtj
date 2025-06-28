@@ -4,7 +4,7 @@ import Release from '../components/Release.astro';
 import UntitledEmbed from '../components/UntitledEmbed.astro';
 import { getClient } from '../lib/sanityClient';
 import { releasesQuery } from '../lib/queries';
-import type { Release as ReleaseType } from '../types/sanity';
+import type { Release as ReleaseType } from '../types/sanity.types';
 
 const releases: ReleaseType[] = await getClient().fetch(releasesQuery);
 ---
@@ -12,7 +12,10 @@ const releases: ReleaseType[] = await getClient().fetch(releasesQuery);
 <Layout>
   {releases.map((release: ReleaseType) => (
     release.type === 'untitled' ? (
-      <UntitledEmbed {...release} />
+      <UntitledEmbed 
+        type={release.type} 
+        {...(release.embedCode && { embedCode: release.embedCode })}
+      />
     ) : (
       <Release {...release} />
     )

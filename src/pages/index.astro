@@ -3,10 +3,54 @@ import LetterCanvas from '../components/LetterCanvas.astro';
 import Layout from '../layouts/Layout.astro';
 import FullBleedImage from '../components/FullBleedImage.astro';
 import familyUrl from '../assets/family.webp';
+import { getClient, urlFor } from '../lib/sanityClient';
+import { landingPageQuery } from '../lib/queries';
+import type { LandingPage } from '../types/sanity.types';
 
+// Fetch landing page data
+const client = getClient();
+const landingPageData: LandingPage | null = await client.fetch(landingPageQuery);
+
+// Use default components if no CMS data is available
+const defaultComponents: NonNullable<LandingPage['components']> = [
+  { _type: 'letterCanvas', enabled: true, _key: 'default-letter-canvas' },
+  { 
+    _type: 'fullBleedImage', 
+    alt: 'Family',
+    _key: 'default-full-bleed'
+  }
+];
+
+const components = landingPageData?.components || defaultComponents;
 ---
 
 <Layout>
-	<LetterCanvas />
-	<FullBleedImage src={familyUrl} alt="Family" />
+	  {components.map((component) => {
+    if (component._type === 'letterCanvas') {
+      // Only render if enabled (default true)
+      if (component.enabled !== false) {
+        return <LetterCanvas />;
+      }
+      return null;
+    }
+    
+    if (component._type === 'fullBleedImage') {
+      // Safely check for valid image asset
+      const hasValidImage = component.image?.asset?._ref && 
+                           component.image.asset._ref.length > 0;
+      
+      const imageSrc = hasValidImage
+        ? urlFor(component.image).width(1920).height(1080).fit('crop').url()
+        : familyUrl.src;
+      
+      return (
+        <FullBleedImage 
+          src={imageSrc} 
+          alt={component.alt || 'Family'} 
+        />
+      );
+    }
+    
+    return null;
+  })}
 </Layout>

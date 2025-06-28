@@ -33,4 +33,13 @@ export const settingsQuery = `*[_type == "settings" && _id == "settings"][0] {
     description
   }
 }`
+
+export const landingPageQuery = `*[_type == "landingPage" && _id == "landingPage"][0] {
+  components[] {
+    _type,
+    enabled,
+    image,
+    alt
+  }
+}`
   

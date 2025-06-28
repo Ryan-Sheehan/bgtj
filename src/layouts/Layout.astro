@@ -4,12 +4,19 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { getClient } from '../lib/sanityClient';
 import { settingsQuery } from '../lib/queries';
+import type { Settings } from '../types/sanity.types';
 
 // Fetch settings data
 const client = getClient();
-const settings = await client.fetch(settingsQuery);
+const settings: Settings | null = await client.fetch(settingsQuery);
 const mailingListTitle = settings?.mailingList?.title;
 const mailingListDescription = settings?.mailingList?.description;
+
+// Create footer props object with only defined values
+const footerProps = {
+	...(mailingListTitle && { title: mailingListTitle }),
+	...(mailingListDescription && { description: mailingListDescription })
+};
 ---
 <!doctype html>
 <html lang="en">
@@ -41,7 +48,7 @@ const mailingListDescription = settings?.mailingList?.description;
 				<slot />
 			</div>
 		</main>
-		<Footer title={mailingListTitle} description={mailingListDescription} />
+		<Footer {...footerProps} />
 		
 		<script src="https://js.supascribe.com/v1/loader/oM707Bo7FLSkPHmbJ3Ecpz2V1IJ3.js" async></script>
 	</body>

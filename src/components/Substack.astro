@@ -13,10 +13,12 @@ import '../styles/substack-embed.css';
 
 <script>
   // Function to inject styles into the iframe
-  function injectStyles(iframe) {
+  function injectStyles(iframe: HTMLIFrameElement) {
     iframe.addEventListener('load', () => {
       try {
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (!iframeDoc) return;
+        
         const styleSheet = document.createElement('style');
         styleSheet.textContent = `
           .embed-page {
@@ -54,7 +56,7 @@ import '../styles/substack-embed.css';
   }
 
   // Get the iframe and inject styles
-  const iframe = document.querySelector('.substack-embed');
+  const iframe = document.querySelector('.substack-embed') as HTMLIFrameElement;
   if (iframe) {
     injectStyles(iframe);
   }

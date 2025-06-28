@@ -1,11 +1,20 @@
 import { orderableDocumentListDeskItem } from '@sanity/orderable-document-list'
 import type { StructureBuilder } from 'sanity/structure'
-import { FiMusic, FiPlayCircle, FiUsers, FiShoppingBag, FiSettings } from 'react-icons/fi'
+import { FiMusic, FiPlayCircle, FiUsers, FiShoppingBag, FiSettings, FiHome } from 'react-icons/fi'
 
 export default (S: StructureBuilder) =>
   S.list()
     .title('Content')
     .items([
+      S.listItem()
+        .title('Landing Page')
+        .icon(FiHome)
+        .child(
+          S.document()
+            .schemaType('landingPage')
+            .documentId('landingPage')
+            .title('Landing Page')
+        ),
       orderableDocumentListDeskItem({
         type: 'release',
         title: 'Releases',

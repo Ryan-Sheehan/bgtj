@@ -1,27 +1,41 @@
 ---
 import { urlFor } from '../lib/sanityClient';
-const { title, artwork, linkAggregator } = Astro.props;
+import type { Release } from '../types/sanity.types';
+
+export interface Props {
+  title?: string;
+  artwork?: Release['artwork'];
+  linkAggregator?: string;
+  type?: 'release' | 'untitled';
+  embedCode?: string;
+}
+
+const { title, artwork, linkAggregator, type, embedCode } = Astro.props;
 ---
 <div class="release-container">
-  <div class="release-content">
-    <h1 class="release-title">{title}</h1>
-    {artwork && (
-      <div class="artwork-container">
-        <img 
-          src={urlFor(artwork).width(800).height(800).fit('crop').url()} 
-          alt={title} 
-          class="release-artwork" 
-        />
-        <div class="artwork-overlay"></div>
-      </div>
-    )}
-    {linkAggregator && (
-      <a href={linkAggregator} class="release-listen-btn" target="_blank" rel="noopener noreferrer">
-        <span class="btn-text">Listen Now</span>
-        <div class="btn-glow"></div>
-      </a>
-    )}
-  </div>
+  {type === 'untitled' && embedCode ? (
+    <div class="untitled-embed" set:html={embedCode}></div>
+  ) : (
+    <div class="release-content">
+      <h1 class="release-title">{title}</h1>
+      {artwork && (
+        <div class="artwork-container">
+          <img 
+            src={urlFor(artwork).width(800).height(800).fit('crop').url()} 
+            alt={title || 'Release artwork'} 
+            class="release-artwork" 
+          />
+          <div class="artwork-overlay"></div>
+        </div>
+      )}
+      {linkAggregator && (
+        <a href={linkAggregator} class="release-listen-btn" target="_blank" rel="noopener noreferrer">
+          <span class="btn-text">Listen Now</span>
+          <div class="btn-glow"></div>
+        </a>
+      )}
+    </div>
+  )}
 </div>
 
 <style>
@@ -33,6 +47,12 @@ const { title, artwork, linkAggregator } = Astro.props;
   align-items: center;
   width: 100%;
   padding: 4rem 0;
+}
+
+.untitled-embed {
+  grid-column: 2 / -2;
+  width: 100%;
+  max-width: 600px;
 }
 
 .release-content {
@@ -125,6 +145,12 @@ const { title, artwork, linkAggregator } = Astro.props;
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .untitled-embed {
+    grid-column: 1 / -1;
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+  
   .release-content {
     grid-column: 1 / -1;
     gap: 2rem;
@@ -147,6 +173,10 @@ const { title, artwork, linkAggregator } = Astro.props;
 }
 
 @media (max-width: 480px) {
+  .untitled-embed {
+    padding: 0 0.5rem;
+  }
+  
   .release-content {
     gap: 1.5rem;
     padding: 0 0.5rem;

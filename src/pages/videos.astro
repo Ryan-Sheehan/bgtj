@@ -3,7 +3,7 @@ import '../styles/global.css';
 import Layout from '../layouts/Layout.astro';
 import { getClient } from '../lib/sanityClient';
 import { videosQuery } from '../lib/queries';
-import type { Video } from '../types/sanity';
+import type { Video } from '../types/sanity.types';
 
 const videos: Video[] = await getClient().fetch(videosQuery);
 ---
@@ -13,6 +13,7 @@ const videos: Video[] = await getClient().fetch(videosQuery);
     <ul class="videos-list">
       {videos.map((video: Video) => {
         // Extract YouTube video ID from URL
+        if (!video.youtubeUrl) return null;
         let idMatch = video.youtubeUrl.match(/[?&]v=([^&#]+)/) || video.youtubeUrl.match(/youtu\.be\/([^?&#]+)/);
         let videoId = idMatch ? idMatch[1] : '';
         return (
