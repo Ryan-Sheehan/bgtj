@@ -4,16 +4,191 @@ import Layout from '../layouts/Layout.astro';
 
 <Layout title="Shows">
   <div class="shows-container">
-    <div id="seated-55fdf2c0" data-artist-id="ccba1ffa-1810-4ae9-9102-daa2be1a026b" data-css-version="3"></div>
+    <div class="shows-content">
+      <div id="seated-55fdf2c0" data-artist-id="ccba1ffa-1810-4ae9-9102-daa2be1a026b" data-css-version="3"></div>
+    </div>
   </div>
 </Layout>
 
 <style>
-  .shows-container {
-    grid-column: 1 / -1;
-    width: 100%;
-    min-height: 500px;
+.shows-container {
+  grid-column: 1 / -1;
+  width: 100%;
+  padding: 4rem 0;
+}
+
+.shows-content {
+  width: 100%;
+  min-height: 500px;
+}
+
+/* ===== WIDGET BASE STYLING ===== */
+.shows-content :global(.seated-widget) {
+  background: transparent !important;
+  color: var(--color-text) !important;
+  font-family: 'Ouvrieres Affamees', sans-serif !important;
+}
+
+.shows-content :global(.seated-event) {
+  background: transparent !important;
+  border-color: var(--color-text) !important;
+  color: var(--color-text) !important;
+}
+
+/* ===== TEXT CONTENT STYLING ===== */
+.shows-content :global(.seated-event-date) {
+  color: var(--color-text) !important;
+  font-weight: 600 !important;
+}
+
+.shows-content :global(.seated-event-venue) {
+  color: var(--color-text) !important;
+  opacity: 0.8;
+}
+
+.shows-content :global(.seated-event-location) {
+  color: var(--color-text) !important;
+  opacity: 0.7;
+}
+
+.shows-content :global(.seated-no-events) {
+  color: var(--color-text) !important;
+  text-align: center !important;
+  font-size: 1.25rem !important;
+  padding: 3rem 0 !important;
+  opacity: 0.7;
+}
+
+/* ===== BUTTONS & LINKS STYLING ===== */
+.shows-content :global(.seated-event-button),
+.shows-content :global(.seated-event-link),
+.shows-content :global(.seated-event-link1),
+.shows-content :global([class*="seated-event-link"]),
+.shows-content :global([class*="button"]),
+.shows-content :global(button) {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-text) !important;
+  border-width: 1px !important;
+  border-radius: 0 !important;
+}
+
+.shows-content :global(.seated-event-button:hover),
+.shows-content :global(.seated-event-link:hover),
+.shows-content :global(.seated-event-link1:hover),
+.shows-content :global([class*="seated-event-link"]:hover) {
+  opacity: 0.8 !important;
+}
+
+/* ===== BORDERS & DIVIDERS ===== */
+.shows-content :global(.seated-divider),
+.shows-content :global(.seated-list-item),
+.shows-content :global(.seated-event-row),
+.shows-content :global(.seated-events-table),
+.shows-content :global(.seated-table),
+.shows-content :global(.seated-table td),
+.shows-content :global(.seated-table th),
+.shows-content :global(.seated-row),
+.shows-content :global([class*="seated-"]) {
+  border-color: var(--color-text) !important;
+}
+
+/* Show clickable cursor but prevent visual hover effects on rows */
+.shows-content :global(.seated-event-row),
+.shows-content :global(.seated-list-item),
+.shows-content :global(.seated-row),
+.shows-content :global(tr) {
+  cursor: pointer !important;
+}
+
+.shows-content :global(.seated-event-row:hover),
+.shows-content :global(.seated-list-item:hover),
+.shows-content :global(.seated-row:hover),
+.shows-content :global(tr:hover) {
+  background-color: transparent !important;
+  background: transparent !important;
+  transform: none !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+}
+
+.shows-content :global(td:hover),
+.shows-content :global(th:hover) {
+  background-color: transparent !important;
+  background: transparent !important;
+  cursor: pointer !important;
+}
+
+.shows-content :global(.seated-table) {
+  border-collapse: collapse !important;
+}
+
+.shows-content :global(.seated-list-item) {
+  border-bottom: 1px solid var(--color-text) !important;
+  border-opacity: 0.2 !important;
+  padding: 1.5rem 0 !important;
+}
+
+.shows-content :global(.seated-list-item:last-child) {
+  border-bottom: none !important;
+}
+
+.shows-content :global(.seated-divider) {
+  opacity: 0.2 !important;
+}
+
+/* ===== FALLBACK OVERRIDES ===== */
+.shows-content :global(hr),
+.shows-content :global([class*="divider"]),
+.shows-content :global([class*="separator"]),
+.shows-content :global([class*="line"]) {
+  border-color: var(--color-text) !important;
+  background-color: var(--color-text) !important;
+  opacity: 0.2 !important;
+}
+
+.shows-content :global([style*="border-top"]) {
+  border-top-color: var(--color-text) !important;
+}
+
+.shows-content :global([style*="border-bottom"]) {
+  border-bottom-color: var(--color-text) !important;
+}
+
+.shows-content :global([style*="border-left"]) {
+  border-left-color: var(--color-text) !important;
+}
+
+.shows-content :global([style*="border-right"]) {
+  border-right-color: var(--color-text) !important;
+}
+
+/* ===== GENERIC ELEMENT OVERRIDES ===== */
+.shows-content :global(div),
+.shows-content :global(span),
+.shows-content :global(p),
+.shows-content :global(a),
+.shows-content :global(button) {
+  color: var(--color-text) !important;
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+@media (max-width: 768px) {
+  .shows-content {
+    padding: 0 1rem;
   }
+}
+
+@media (max-width: 480px) {
+  .shows-container {
+    padding: 2rem 0;
+  }
+  
+  .shows-content {
+    padding: 0 0.5rem;
+  }
+}
 </style>
 
 <script>
