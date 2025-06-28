@@ -16,7 +16,7 @@
     /* Disable text selection and touch behaviors */
     user-select: none;
     -webkit-user-select: none;
-    touch-action: none;
+    touch-action: pan-y; /* Allow vertical scrolling but prevent other touch gestures */
     /* Improve responsiveness */
     will-change: transform;
   }
@@ -30,7 +30,7 @@
   @media (pointer: coarse) {
     .letters-canvas {
       cursor: default;
-      touch-action: auto;
+      touch-action: pan-y; /* Consistent touch behavior for mobile */
     }
   }
 </style>
@@ -100,6 +100,7 @@
 
     // We'll store currentVariants as a 2D array: [row][col]
     let currentVariants = [];
+    let lastLayout = null;
 
     function getLayout() {
       const parent = canvas.parentElement;
@@ -233,43 +234,73 @@
     }
 
     function setupBehavior() {
-      cleanup();
-      clearTimers();
-      removeDesktopListeners();
-      lastHovered = { row: null, col: null };
-
-      // Recompute layout and update currentVariants if needed
-      const { numRows } = getLayout();
-      initializeVariants(numRows);
-      timers = Array.from({ length: numRows }, () => Array(numLetters).fill(null));
-
-      if (!isMobile()) {
-        canvas.addEventListener('mousemove', throttledMouseMove);
-        canvas.addEventListener('mouseleave', handleMouseLeave);
-        cleanup = () => {
-          canvas.removeEventListener('mousemove', throttledMouseMove);
-          canvas.removeEventListener('mouseleave', handleMouseLeave);
-        };
-      } else {
-        for (let row = 0; row < numRows; row++) {
-          for (let col = 0; col < numLetters; col++) {
-            setRandomTimerForLetter(row, col);
-          }
-        }
-        cleanup = clearTimers;
+      // Recompute layout and check if it actually changed
+      const layout = getLayout();
+      const { numRows } = layout;
+      
+      // Only reset timers if layout significantly changed (prevents scroll interference)
+      const layoutChanged = !lastLayout || 
+                           Math.abs(lastLayout.width - layout.width) > 10 ||
+                           Math.abs(lastLayout.height - layout.height) > 10 ||
+                           lastLayout.numRows !== numRows;
+      
+      if (layoutChanged) {
+        cleanup();
+        clearTimers();
+        removeDesktopListeners();
+        lastHovered = { row: null, col: null };
+        
+        initializeVariants(numRows);
+        timers = Array.from({ length: numRows }, () => Array(numLetters).fill(null));
+        lastLayout = layout;
       }
+
+      if (layoutChanged) {
+        if (!isMobile()) {
+          canvas.addEventListener('mousemove', throttledMouseMove);
+          canvas.addEventListener('mouseleave', handleMouseLeave);
+          cleanup = () => {
+            canvas.removeEventListener('mousemove', throttledMouseMove);
+            canvas.removeEventListener('mouseleave', handleMouseLeave);
+          };
+        } else {
+          for (let row = 0; row < numRows; row++) {
+            for (let col = 0; col < numLetters; col++) {
+              setRandomTimerForLetter(row, col);
+            }
+          }
+          cleanup = clearTimers;
+        }
+      }
+      
+      // Always redraw, even if layout didn't change significantly
+      draw();
     }
 
+    // Debounced resize handling to prevent interference during scroll
+    let resizeTimeout = null;
+    const handleResize = () => {
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        setupBehavior();
+        draw();
+      }, 150); // 150ms debounce
+    };
+
     // Use ResizeObserver for robust resize handling
-    const resizeObserver = new window.ResizeObserver(() => {
-      setupBehavior();
-      draw();
-    });
+    const resizeObserver = new window.ResizeObserver(handleResize);
     resizeObserver.observe(canvas.parentElement);
-    window.addEventListener('orientationchange', () => {
-      setupBehavior();
-      draw();
-    });
+    
+    // Debounced orientation change handler
+    let orientationTimeout = null;
+    const handleOrientationChange = () => {
+      if (orientationTimeout) clearTimeout(orientationTimeout);
+      orientationTimeout = setTimeout(() => {
+        setupBehavior();
+        draw();
+      }, 300); // 300ms debounce for orientation
+    };
+    window.addEventListener('orientationchange', handleOrientationChange);
 
     setupBehavior();
     draw();
