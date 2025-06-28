@@ -101,11 +101,14 @@
     // We'll store currentVariants as a 2D array: [row][col]
     let currentVariants = [];
     let lastLayout = null;
+    
+    // Capture initial viewport height to prevent scroll interference on mobile Safari
+    let fixedViewportHeight = window.innerHeight;
 
     function getLayout() {
       const parent = canvas.parentElement;
       const width = parent.offsetWidth;
-      const height = window.innerHeight;
+      const height = fixedViewportHeight; // Use fixed height to prevent scroll interference
       const gapRatio = 0.12;
       const totalGap = (numLetters - 1) * gapRatio;
       const letterWidth = width / (numLetters + totalGap);
@@ -282,6 +285,11 @@
     const handleResize = () => {
       if (resizeTimeout) clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
+        // Only update viewport height for significant changes (not Safari UI changes)
+        const currentHeight = window.innerHeight;
+        if (Math.abs(currentHeight - fixedViewportHeight) > 100) {
+          fixedViewportHeight = currentHeight;
+        }
         setupBehavior();
         draw();
       }, 150); // 150ms debounce
@@ -296,6 +304,8 @@
     const handleOrientationChange = () => {
       if (orientationTimeout) clearTimeout(orientationTimeout);
       orientationTimeout = setTimeout(() => {
+        // Update viewport height only on actual orientation changes
+        fixedViewportHeight = window.innerHeight;
         setupBehavior();
         draw();
       }, 300); // 300ms debounce for orientation
