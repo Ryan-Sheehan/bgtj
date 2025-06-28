@@ -14,12 +14,6 @@
     transition: background 0.3s;
   }
 
-  @media (prefers-color-scheme: dark) {
-    body {
-      background: #18181b;
-    }
-  }
-
 :root {
   --color-text: #18181b;
   --color-text-rgb: 24,24,27;
