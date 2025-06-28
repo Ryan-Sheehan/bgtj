@@ -11,19 +11,10 @@ const releases: ReleaseType[] = await getClient().fetch(releasesQuery);
 
 <Layout>
   {releases.map((release: ReleaseType) => (
-    <>
-      {release.type === 'untitled' ? (
-        <UntitledEmbed {...release} />
-      ) : (
-        <Release {...release} />
-      )}
-    </>
+    release.type === 'untitled' ? (
+      <UntitledEmbed {...release} />
+    ) : (
+      <Release {...release} />
+    )
   ))}
-</Layout>
-
-<style>
-.music-row {
-  grid-column: 1 / -1;
-  display: contents;
-}
-</style> 
+</Layout> 
