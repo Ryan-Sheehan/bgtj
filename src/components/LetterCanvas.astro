@@ -6,6 +6,7 @@
     width: 100%;
     max-width: 100%;
     height: auto;
+    min-height: 100vh; /* Prevent footer flash during loading */
     box-sizing: border-box;
     overflow-x: hidden;
     grid-column: 1 / 16;
@@ -57,6 +58,18 @@
     return Math.floor(Math.random() * max);
   }
 
+  // Initialize canvas immediately to prevent layout shift
+  const canvas = document.getElementById('letters-canvas');
+  const ctx = canvas.getContext('2d');
+  const numLetters = letters.length;
+
+  // Set up canvas dimensions immediately 
+  const parent = canvas.parentElement;
+  const width = parent.offsetWidth;
+  const height = window.innerHeight;
+  canvas.width = width;
+  canvas.height = height;
+
   const allImages = letters.map(({ dir, count }) =>
     Array.from({ length: count }, (_, i) => {
       const img = new window.Image();
@@ -74,9 +87,6 @@
         })
     )
   ).then(() => {
-    const canvas = document.getElementById('letters-canvas');
-    const ctx = canvas.getContext('2d');
-    const numLetters = letters.length;
     const aspectRatio = allImages[0][0].naturalHeight / allImages[0][0].naturalWidth;
 
     // --- Dynamic behavior switching ---

@@ -5,13 +5,21 @@ export interface Props {
 }
 const { src, alt = '' } = Astro.props;
 ---
-<img src={typeof src === 'string' ? src : src.src} alt={alt} class="full-bleed-image" />
+<img 
+  src={typeof src === 'string' ? src : src.src} 
+  alt={alt} 
+  class="full-bleed-image" 
+  loading="eager"
+  decoding="sync"
+/>
 <style>
 .full-bleed-image {
   display: block;
   width: 100vw;
+  height: 100vh; /* Set explicit height to prevent layout shift */
   margin: 0 calc(50% - 50vw);
   object-fit: cover;
+  object-position: center;
   grid-column: 1 / -1;
 }
 </style> 
