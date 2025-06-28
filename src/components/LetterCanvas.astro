@@ -9,6 +9,29 @@
     box-sizing: border-box;
     overflow-x: hidden;
     grid-column: 1 / 16;
+    cursor: default;
+    /* Optimize for crisp rendering */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    /* Disable text selection and touch behaviors */
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    /* Improve responsiveness */
+    will-change: transform;
+  }
+  
+  @media (pointer: fine) {
+    .letters-canvas:hover {
+      cursor: default;
+    }
+  }
+  
+  @media (pointer: coarse) {
+    .letters-canvas {
+      cursor: default;
+      touch-action: auto;
+    }
   }
 </style>
 <script type="module" is:inline>
@@ -71,7 +94,7 @@
     }
 
     function removeDesktopListeners() {
-      canvas.removeEventListener('mousemove', handleMouseMove);
+      canvas.removeEventListener('mousemove', throttledMouseMove);
       canvas.removeEventListener('mouseleave', handleMouseLeave);
     }
 
@@ -109,40 +132,70 @@
     function handleMouseMove(e) {
       const { letterWidth, gap, letterHeight, numRows } = getLayout();
       const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      
+      // Get precise mouse coordinates accounting for canvas scaling and DPI
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const x = (e.clientX - rect.left) * scaleX;
+      const y = (e.clientY - rect.top) * scaleY;
+      
       let hoveredCol = null;
       let hoveredRow = null;
-      for (let col = 0; col < numLetters; col++) {
-        const startX = col * (letterWidth + gap);
+      
+      // More efficient column detection using direct calculation
+      const rawCol = Math.floor(x / (letterWidth + gap));
+      if (rawCol >= 0 && rawCol < numLetters) {
+        const startX = rawCol * (letterWidth + gap);
         const endX = startX + letterWidth;
         if (x >= startX && x < endX) {
-          hoveredCol = col;
-          break;
+          hoveredCol = rawCol;
         }
       }
-      for (let row = 0; row < numRows; row++) {
-        const startY = row * letterHeight;
+      
+      // More efficient row detection using direct calculation
+      const rawRow = Math.floor(y / letterHeight);
+      if (rawRow >= 0 && rawRow < numRows) {
+        const startY = rawRow * letterHeight;
         const endY = startY + letterHeight;
         if (y >= startY && y < endY) {
-          hoveredRow = row;
-          break;
+          hoveredRow = rawRow;
         }
       }
+      
+      // Only trigger change if we're over a valid letter and it's different from last hovered
       if (
         hoveredRow !== null &&
         hoveredCol !== null &&
+        hoveredRow >= 0 && hoveredRow < numRows &&
+        hoveredCol >= 0 && hoveredCol < numLetters &&
         (hoveredRow !== lastHovered.row || hoveredCol !== lastHovered.col)
       ) {
         currentVariants[hoveredRow][hoveredCol] =
           (currentVariants[hoveredRow][hoveredCol] + 1) % allImages[hoveredCol].length;
         draw();
       }
+      
       lastHovered = { row: hoveredRow, col: hoveredCol };
+    }
+
+    // Throttled mouse move handler for better performance
+    let mouseThrottleTimer = null;
+    function throttledMouseMove(e) {
+      if (mouseThrottleTimer) return;
+      
+      mouseThrottleTimer = requestAnimationFrame(() => {
+        handleMouseMove(e);
+        mouseThrottleTimer = null;
+      });
     }
 
     function handleMouseLeave() {
       lastHovered = { row: null, col: null };
+      // Cancel any pending throttled mouse events
+      if (mouseThrottleTimer) {
+        cancelAnimationFrame(mouseThrottleTimer);
+        mouseThrottleTimer = null;
+      }
     }
 
     function setRandomTimerForLetter(row, col) {
@@ -191,10 +244,10 @@
       timers = Array.from({ length: numRows }, () => Array(numLetters).fill(null));
 
       if (!isMobile()) {
-        canvas.addEventListener('mousemove', handleMouseMove);
+        canvas.addEventListener('mousemove', throttledMouseMove);
         canvas.addEventListener('mouseleave', handleMouseLeave);
         cleanup = () => {
-          canvas.removeEventListener('mousemove', handleMouseMove);
+          canvas.removeEventListener('mousemove', throttledMouseMove);
           canvas.removeEventListener('mouseleave', handleMouseLeave);
         };
       } else {
