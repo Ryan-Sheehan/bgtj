@@ -16,24 +16,25 @@ const about = await getClient().fetch(`*[_type == 'about'][0]{content}`);
 
 <style>
 .about-container {
-  display: grid;
   grid-column: 1 / -1;
-  grid-template-columns: subgrid;
-  justify-items: center;
   width: 100%;
-  padding: 4rem 0;
+  padding: 4rem 2.5vw;
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .about-content {
-  grid-column: 3 / -3;
-  max-width: 800px;
+  grid-column: 4 / 13;
   width: 100%;
   color: var(--color-text);
-  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-size: 2.5rem;
   line-height: 1.2;
   letter-spacing: -0.01em;
   font-weight: 400;
   text-align: left;
+  box-sizing: border-box;
 }
 
 .about-content :global(p) {
@@ -49,7 +50,7 @@ const about = await getClient().fetch(`*[_type == 'about'][0]{content}`);
 
 .about-content :global(h1) {
   font-family: 'Smokum', serif;
-  font-size: clamp(3rem, 6vw, 5rem);
+  font-size: 4rem;
   font-weight: 400;
   line-height: 1.1;
   margin: 0 0 2.5rem 0;
@@ -59,7 +60,7 @@ const about = await getClient().fetch(`*[_type == 'about'][0]{content}`);
 
 .about-content :global(h2) {
   font-family: 'Smokum', serif;
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: 3.5rem;
   font-weight: 400;
   line-height: 1.1;
   margin: 3rem 0 1.5rem 0;
@@ -69,7 +70,7 @@ const about = await getClient().fetch(`*[_type == 'about'][0]{content}`);
 
 .about-content :global(h3) {
   font-family: 'Smokum', serif;
-  font-size: clamp(2rem, 4vw, 3rem);
+  font-size: 3rem;
   font-weight: 400;
   line-height: 1.2;
   margin: 2.5rem 0 1rem 0;
@@ -144,9 +145,26 @@ const about = await getClient().fetch(`*[_type == 'about'][0]{content}`);
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .about-container {
+    padding: 4rem 0;
+  }
+  
   .about-content {
     grid-column: 2 / -2;
-    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    font-size: 2rem;
+    padding: 0;
+  }
+  
+  .about-content :global(h1) {
+    font-size: 3rem;
+  }
+
+  .about-content :global(h2) {
+    font-size: 2.75rem;
+  }
+
+  .about-content :global(h3) {
+    font-size: 2.5rem;
   }
   
   .about-content :global(img) {
@@ -170,8 +188,21 @@ const about = await getClient().fetch(`*[_type == 'about'][0]{content}`);
   }
   
   .about-content {
-    grid-column: 1 / -1;
-    padding: 0 1rem;
+    grid-column: 2 / -2;
+    font-size: 1.75rem;
+    padding: 0;
+  }
+
+  .about-content :global(h1) {
+    font-size: 2.5rem;
+  }
+
+  .about-content :global(h2) {
+    font-size: 2.25rem;
+  }
+
+  .about-content :global(h3) {
+    font-size: 2rem;
   }
 }
 </style> 

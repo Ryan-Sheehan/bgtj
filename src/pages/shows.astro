@@ -14,12 +14,18 @@ import Layout from '../layouts/Layout.astro';
 .shows-container {
   grid-column: 1 / -1;
   width: 100%;
-  padding: 4rem 0;
+  padding: 4rem 2.5vw;
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .shows-content {
+  grid-column: 2 / -2;
   width: 100%;
   min-height: 500px;
+  box-sizing: border-box;
 }
 
 /* ===== WIDGET BASE STYLING ===== */
@@ -27,6 +33,10 @@ import Layout from '../layouts/Layout.astro';
   background: transparent !important;
   color: var(--color-text) !important;
   font-family: 'Courier Prime', monospace !important;
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
 }
 
 .shows-content :global(.seated-event) {
@@ -203,18 +213,19 @@ import Layout from '../layouts/Layout.astro';
 
 /* ===== RESPONSIVE ADJUSTMENTS ===== */
 @media (max-width: 768px) {
+  .shows-container {
+    padding: 4rem 0;
+  }
+  
   .shows-content {
-    padding: 0 1rem;
+    grid-column: 1 / -1;
+    padding: 0;
   }
 }
 
 @media (max-width: 480px) {
   .shows-container {
     padding: 2rem 0;
-  }
-  
-  .shows-content {
-    padding: 0 0.5rem;
   }
 }
 </style>
