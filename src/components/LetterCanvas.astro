@@ -1,4 +1,44 @@
 <canvas id="letters-canvas" class="letters-canvas"></canvas>
+
+<!-- Immediate canvas clearing to prevent Mobile Safari white flash -->
+<script>
+  // Run immediately to prevent white flash on Mobile Safari
+  (function() {
+    const canvas = document.getElementById('letters-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        // Clear immediately with fallback dimensions
+        ctx.clearRect(0, 0, canvas.width || 1, canvas.height || 1);
+        
+        // Mobile Safari detection
+        const isMobileSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && 
+                              /Safari/.test(navigator.userAgent) && 
+                              !/Chrome/.test(navigator.userAgent);
+        
+        if (isMobileSafari) {
+          // Additional Mobile Safari specific clearing
+          ctx.globalCompositeOperation = 'source-over';
+          ctx.fillStyle = 'rgba(0,0,0,0)';
+          ctx.fillRect(0, 0, canvas.width || 1, canvas.height || 1);
+          ctx.globalCompositeOperation = 'source-over';
+        }
+      }
+    }
+  })();
+  
+  // Also clear on DOMContentLoaded to catch any late rendering
+  document.addEventListener('DOMContentLoaded', function() {
+    const canvas = document.getElementById('letters-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width || 1, canvas.height || 1);
+      }
+    }
+  });
+</script>
+
 <style>
   .letters-canvas {
     display: block;
@@ -13,6 +53,8 @@
     cursor: default;
     /* Ensure transparent background - no white flashes */
     background: transparent !important;
+    /* Mobile Safari specific: force transparent background */
+    background-color: transparent !important;
     /* Optimize for crisp rendering */
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
@@ -28,6 +70,40 @@
     /* Prevent white flash on mobile Safari */
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
+    /* Additional Mobile Safari fixes */
+    -webkit-perspective: 1000;
+    perspective: 1000;
+    /* Force hardware acceleration and prevent white flash */
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+  }
+  
+  /* Mobile Safari specific overrides */
+  @supports (-webkit-touch-callout: none) {
+    .letters-canvas {
+      /* Force transparent background on Mobile Safari */
+      background: rgba(0, 0, 0, 0) !important;
+      background-color: rgba(0, 0, 0, 0) !important;
+      /* Additional Mobile Safari optimizations */
+      -webkit-appearance: none;
+      appearance: none;
+    }
+  }
+  
+  /* Additional Mobile Safari specific rules */
+  @media screen and (-webkit-min-device-pixel-ratio: 0) {
+    .letters-canvas {
+      background: transparent !important;
+      background-color: transparent !important;
+    }
+  }
+  
+  /* iOS Safari specific */
+  @supports (-webkit-touch-callout: none) and (not (translate: none)) {
+    .letters-canvas {
+      background: rgba(0, 0, 0, 0) !important;
+      background-color: rgba(0, 0, 0, 0) !important;
+    }
   }
   
   @media (pointer: fine) {
@@ -44,6 +120,16 @@
   }
 </style>
 <script type="module" is:inline>
+  // Immediately clear canvas to prevent white flash on Mobile Safari
+  const canvas = document.getElementById('letters-canvas');
+  const ctx = canvas?.getContext('2d');
+  
+  // CRITICAL: Clear canvas immediately before any other operations
+  // This prevents Mobile Safari from showing white background
+  if (ctx) {
+    ctx.clearRect(0, 0, canvas.width || 1, canvas.height || 1);
+  }
+  
   const letters = [
     { dir: '1-B', count: 9 },
     { dir: '2-O', count: 10 },
@@ -78,8 +164,6 @@
   // Extracted colors preserved in src/data/extracted-colors.json for future use
 
   // Initialize canvas immediately to prevent layout shift
-  const canvas = document.getElementById('letters-canvas');
-  const ctx = canvas.getContext('2d');
   const numLetters = letters.length;
 
   // Global variables for canvas behavior (declare early)
@@ -109,34 +193,36 @@
 
   // Set up canvas dimensions immediately with correct aspect ratio
   // Use square skeleton rectangles initially, let actual images determine their aspect ratios
-  const parent = canvas.parentElement;
-  const width = parent.offsetWidth;
-  const height = getMobileSafariViewportHeight();
-  const initialAspectRatio = 1.5; // Taller skeleton rectangles
-  
-  // Calculate layout with better initial aspect ratio
-  const gapRatio = 0.12;
-  const totalGap = (letters.length - 1) * gapRatio;
-  const letterWidth = width / (letters.length + totalGap);
-  const gap = letterWidth * gapRatio;
-  const letterHeight = letterWidth * initialAspectRatio;
-  const numRows = Math.floor(height / letterHeight);
-  
-  canvas.width = width;
-  canvas.height = height;
-  
-  // Ensure canvas is transparent to prevent white flash
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  // Initialize variants with correct number of rows from the start
-  currentVariants = Array.from({ length: numRows }, () =>
-    letters.map((_, col) => randomIndex(letters[col].count))
-  );
-  
-  // Draw skeleton immediately to show progressive loading
-  // (aspectRatio will be null initially, but draw() now handles this with initialAspectRatio)
-  aspectRatio = initialAspectRatio; // Set initial aspect ratio so draw() works immediately
-  draw();
+  if (canvas && ctx) {
+    const parent = canvas.parentElement;
+    const width = parent.offsetWidth;
+    const height = getMobileSafariViewportHeight();
+    const initialAspectRatio = 1.5; // Taller skeleton rectangles
+    
+    // Calculate layout with better initial aspect ratio
+    const gapRatio = 0.12;
+    const totalGap = (letters.length - 1) * gapRatio;
+    const letterWidth = width / (letters.length + totalGap);
+    const gap = letterWidth * gapRatio;
+    const letterHeight = letterWidth * initialAspectRatio;
+    const numRows = Math.floor(height / letterHeight);
+    
+    canvas.width = width;
+    canvas.height = height;
+    
+    // CRITICAL: Clear canvas again after setting dimensions to prevent white flash
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Initialize variants with correct number of rows from the start
+    currentVariants = Array.from({ length: numRows }, () =>
+      letters.map((_, col) => randomIndex(letters[col].count))
+    );
+    
+    // Draw skeleton immediately to show progressive loading
+    // (aspectRatio will be null initially, but draw() now handles this with initialAspectRatio)
+    aspectRatio = initialAspectRatio; // Set initial aspect ratio so draw() works immediately
+    draw();
+  }
 
   // Track individual image loading and opacity for fade-in effect
 
@@ -178,6 +264,7 @@
 
 
   function getLayout() {
+    if (!canvas) return { width: 0, height: 0, letterWidth: 0, letterHeight: 0, gap: 0, numRows: 0 };
     const parent = canvas.parentElement;
     const width = parent.offsetWidth;
     const height = getMobileSafariViewportHeight(); // Use mobile Safari-aware height
@@ -194,6 +281,8 @@
 
   // Global function needed by animateImageIn
   function draw() {
+    if (!canvas || !ctx) return;
+    
     // Always draw, even before first image loads (use initial aspect ratio)
     const { width, height, letterWidth, letterHeight, gap, numRows } = getLayout();
     
@@ -291,11 +380,15 @@
     }
 
     function removeDesktopListeners() {
-      canvas.removeEventListener('mousemove', throttledMouseMove);
-      canvas.removeEventListener('mouseleave', handleMouseLeave);
+      if (canvas) {
+        canvas.removeEventListener('mousemove', throttledMouseMove);
+        canvas.removeEventListener('mouseleave', handleMouseLeave);
+      }
     }
 
     function handleMouseMove(e) {
+      if (!canvas) return;
+      
       const { letterWidth, gap, letterHeight, numRows } = getLayout();
       const rect = canvas.getBoundingClientRect();
       
@@ -401,6 +494,8 @@
     }
 
     function setupBehavior() {
+      if (!canvas) return;
+      
       // Recompute layout and check if it actually changed
       const layout = getLayout();
       const { numRows } = layout;
@@ -427,8 +522,10 @@
           canvas.addEventListener('mousemove', throttledMouseMove);
           canvas.addEventListener('mouseleave', handleMouseLeave);
           cleanup = () => {
-            canvas.removeEventListener('mousemove', throttledMouseMove);
-            canvas.removeEventListener('mouseleave', handleMouseLeave);
+            if (canvas) {
+              canvas.removeEventListener('mousemove', throttledMouseMove);
+              canvas.removeEventListener('mouseleave', handleMouseLeave);
+            }
           };
         } else {
           for (let row = 0; row < numRows; row++) {
@@ -447,6 +544,8 @@
     // Debounced resize handling to prevent interference during scroll
     let resizeTimeout = null;
     const handleResize = () => {
+      if (!canvas) return;
+      
       if (resizeTimeout) clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
         // Update canvas dimensions to match new parent width
@@ -468,12 +567,16 @@
     };
 
     // Use ResizeObserver for robust resize handling
-    const resizeObserver = new window.ResizeObserver(handleResize);
-    resizeObserver.observe(canvas.parentElement);
+    if (canvas && canvas.parentElement) {
+      const resizeObserver = new window.ResizeObserver(handleResize);
+      resizeObserver.observe(canvas.parentElement);
+    }
     
     // Mobile Safari specific: handle visual viewport changes
     if (window.visualViewport && isMobileSafari()) {
       window.visualViewport.addEventListener('resize', () => {
+        if (!canvas) return;
+        
         if (resizeTimeout) clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
           const newHeight = getMobileSafariViewportHeight();
@@ -489,6 +592,8 @@
     // Debounced orientation change handler
     let orientationTimeout = null;
     const handleOrientationChange = () => {
+      if (!canvas) return;
+      
       if (orientationTimeout) clearTimeout(orientationTimeout);
       orientationTimeout = setTimeout(() => {
         // Update viewport height using mobile Safari-aware method
