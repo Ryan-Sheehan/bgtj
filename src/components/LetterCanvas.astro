@@ -71,14 +71,18 @@
   const height = window.innerHeight;
   canvas.width = width;
   canvas.height = height;
+  
+  // Fill with solid red background immediately to prevent blank screen
+  ctx.fillStyle = '#8B0000';
+  ctx.fillRect(0, 0, width, height);
 
-  // Draw skeleton loader immediately
+  // Draw skeleton loader immediately (will be updated when first image loads)
   function drawSkeleton() {
     const gapRatio = 0.12;
     const totalGap = (numLetters - 1) * gapRatio;
     const letterWidth = width / (numLetters + totalGap);
     const gap = letterWidth * gapRatio;
-    const letterHeight = letterWidth * 1.4; // Approximate aspect ratio
+    const letterHeight = letterWidth * 1.4; // Approximate aspect ratio, updated when images load
     const numRows = Math.floor(height / letterHeight);
 
     ctx.clearRect(0, 0, width, height);
@@ -99,65 +103,178 @@
     }
   }
 
-  // Show skeleton immediately
-  drawSkeleton();
+  // Track individual image loading and opacity for fade-in effect
+  const imageOpacities = new Map();
+  let aspectRatio = null; // Will be set when first image loads
+  let anyImageLoaded = false;
 
   const allImages = letters.map(({ dir, count }) =>
     Array.from({ length: count }, (_, i) => {
       const img = new window.Image();
       img.src = `/letters/${dir}/${i + 1}.webp`;
+      
+      // Create unique key for this specific image
+      const imageKey = `${dir}-${i + 1}`;
+      imageOpacities.set(imageKey, 0);
+      
+      // Individual image load handler
+      const handleImageLoad = () => {
+        // Update aspect ratio from first loaded image
+        if (!anyImageLoaded) {
+          aspectRatio = img.naturalHeight / img.naturalWidth;
+          anyImageLoaded = true;
+          console.log('First image loaded, aspect ratio:', aspectRatio);
+          
+          // Now that we have the correct aspect ratio, set up the canvas properly
+          const layout = getLayout();
+          canvas.width = layout.width;
+          canvas.height = layout.height;
+          
+          // Re-initialize variants with correct number of rows
+          const { numRows } = layout;
+          currentVariants = Array.from({ length: numRows }, () =>
+            letters.map((_, col) => randomIndex(allImages[col].length))
+          );
+          
+          // Draw initial skeleton
+          draw();
+          
+          // Now set up interactive behavior
+          setupBehavior();
+        }
+        
+        console.log('Image loaded:', imageKey);
+        
+        // Start individual fade-in animation for this image
+        animateImageIn(imageKey);
+      };
+      
+      if (img.complete) {
+        handleImageLoad();
+      } else {
+        img.onload = handleImageLoad;
+      }
+      
       return img;
     })
   );
 
-  Promise.all(
-    allImages.flat().map(
-      img =>
-        new Promise(resolve => {
-          if (img.complete) resolve();
-          else img.onload = resolve;
-        })
-    )
-  ).then(() => {
-    const aspectRatio = allImages[0][0].naturalHeight / allImages[0][0].naturalWidth;
-    
-    // Update skeleton with correct aspect ratio once first image loads
-    function drawUpdatedSkeleton() {
-      const gapRatio = 0.12;
-      const totalGap = (numLetters - 1) * gapRatio;
-      const letterWidth = width / (numLetters + totalGap);
-      const gap = letterWidth * gapRatio;
-      const letterHeight = letterWidth * aspectRatio; // Now we have the real aspect ratio
-      const numRows = Math.floor(height / letterHeight);
+  // Global variables for canvas behavior
+  let currentVariants = [];
+  let fixedViewportHeight = window.innerHeight;
+  
+  // Initialize with a reasonable default to prevent errors during image loading
+  const defaultRows = Math.floor(window.innerHeight / 100); // Rough estimate
+  currentVariants = Array.from({ length: defaultRows }, () =>
+    letters.map((_, col) => randomIndex(allImages[col].length)) // Random variant for each position
+  );
 
-      ctx.clearRect(0, 0, width, height);
-      
-      for (let row = 0; row < numRows; row++) {
-        for (let col = 0; col < numLetters; col++) {
-          // Simple subtle gray for skeleton
-          ctx.fillStyle = `rgba(255, 255, 255, 0.15)`; // Very subtle white overlay
+  function getLayout() {
+    const parent = canvas.parentElement;
+    const width = parent.offsetWidth;
+    const height = fixedViewportHeight; // Use fixed height to prevent scroll interference
+    const gapRatio = 0.12;
+    const totalGap = (numLetters - 1) * gapRatio;
+    const letterWidth = width / (numLetters + totalGap);
+    const gap = letterWidth * gapRatio;
+    const letterHeight = letterWidth * (aspectRatio || 1.4); // Fallback to 1.4 if not set
+    const numRows = Math.floor(height / letterHeight);
+    return { width, height, letterWidth, letterHeight, gap, numRows };
+  }
+
+  function draw() {
+    // Don't draw until we have the correct aspect ratio
+    if (aspectRatio === null) {
+      return;
+    }
+    
+    const { width, height, letterWidth, letterHeight, gap, numRows } = getLayout();
+    canvas.width = width;
+    canvas.height = height;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw each position: skeleton fading out as image fades in
+    for (let row = 0; row < numRows; row++) {
+      for (let col = 0; col < numLetters; col++) {
+        const x = col * (letterWidth + gap);
+        const y = row * letterHeight;
+        
+        // Get current image variant and its opacity
+        let imgOpacity = 0;
+        if (currentVariants[row]) {
+          const variant = currentVariants[row][col];
+          const imageKey = `${letters[col].dir}-${variant + 1}`;
+          imgOpacity = imageOpacities.get(imageKey) || 0;
           
-          const x = col * (letterWidth + gap);
-          const y = row * letterHeight;
+          // Debug: log first few lookups
+          if (row === 0 && col < 3) {
+            console.log(`Looking for key: ${imageKey}, found opacity: ${imgOpacity}`);
+          }
+        }
+        
+        const skeletonOpacity = 1 - imgOpacity;
+        
+        // Draw skeleton for this position (fades out as image loads)
+        if (skeletonOpacity > 0) {
+          ctx.globalAlpha = skeletonOpacity;
+          ctx.fillStyle = `rgba(255, 255, 255, 0.15)`;
           
           // Add slight randomness to make it more dynamic
           const randomOffset = Math.sin((row + col) * 0.5) * 3;
-          
           ctx.fillRect(x + randomOffset, y + randomOffset, letterWidth - 2, letterHeight - 2);
+        }
+        
+        // Draw image for this position (fades in as it loads)
+        if (imgOpacity > 0 && currentVariants[row]) {
+          ctx.globalAlpha = imgOpacity;
+          const variant = currentVariants[row][col];
+          const img = allImages[col][variant];
+          ctx.drawImage(img, x, y, letterWidth, letterHeight);
         }
       }
     }
     
-    // Draw updated skeleton briefly, then transition to actual letters
-    drawUpdatedSkeleton();
-    
-    // Small delay to let users see the updated skeleton before switching to letters
-    setTimeout(() => {
+    ctx.globalAlpha = 1; // Reset alpha
+  }
 
-    // --- Dynamic behavior switching ---
+  // Animate individual image fade-in
+  function animateImageIn(imageKey) {
+    const startTime = performance.now();
+    const duration = 350; // 350ms per image
+    
+    function animate() {
+      const elapsed = performance.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Smooth easing (ease-out cubic)
+      const eased = 1 - Math.pow(1 - progress, 3);
+      imageOpacities.set(imageKey, eased);
+      
+      // Debug: log when animation completes
+      if (progress >= 1) {
+        console.log(`Animation complete for ${imageKey}, final opacity: ${eased}`);
+        console.log('All loaded keys:', Array.from(imageOpacities.keys()).slice(0, 10));
+      }
+      
+      // Trigger redraw
+      draw();
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    }
+    
+    requestAnimationFrame(animate);
+  }
+
+  // Initialize canvas behavior immediately (don't wait for images)
+  initializeCanvasBehavior();
+  
+  function initializeCanvasBehavior() {
     let cleanup = () => {};
     let timers = [];
     let lastHovered = { row: null, col: null };
+    let lastLayout = null;
 
     function isMobile() {
       return !window.matchMedia('(pointer: fine)').matches || window.innerWidth <= 768;
@@ -171,41 +288,6 @@
     function removeDesktopListeners() {
       canvas.removeEventListener('mousemove', throttledMouseMove);
       canvas.removeEventListener('mouseleave', handleMouseLeave);
-    }
-
-    // We'll store currentVariants as a 2D array: [row][col]
-    let currentVariants = [];
-    let lastLayout = null;
-    
-    // Capture initial viewport height to prevent scroll interference on mobile Safari
-    let fixedViewportHeight = window.innerHeight;
-
-    function getLayout() {
-      const parent = canvas.parentElement;
-      const width = parent.offsetWidth;
-      const height = fixedViewportHeight; // Use fixed height to prevent scroll interference
-      const gapRatio = 0.12;
-      const totalGap = (numLetters - 1) * gapRatio;
-      const letterWidth = width / (numLetters + totalGap);
-      const gap = letterWidth * gapRatio;
-      const letterHeight = letterWidth * aspectRatio;
-      const numRows = Math.floor(height / letterHeight);
-      return { width, height, letterWidth, letterHeight, gap, numRows };
-    }
-
-    function draw() {
-      const { width, height, letterWidth, letterHeight, gap, numRows } = getLayout();
-      canvas.width = width;
-      canvas.height = height;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (let row = 0; row < numRows; row++) {
-        for (let col = 0; col < numLetters; col++) {
-          const img = allImages[col][currentVariants[row][col]];
-          const x = col * (letterWidth + gap);
-          const y = row * letterHeight;
-          ctx.drawImage(img, x, y, letterWidth, letterHeight);
-        }
-      }
     }
 
     function handleMouseMove(e) {
@@ -387,8 +469,7 @@
     };
     window.addEventListener('orientationchange', handleOrientationChange);
 
-    setupBehavior();
-    draw();
-    }, 200); // 200ms delay to show skeleton briefly
-  });
+    // Don't set up behavior until first image loads with correct aspect ratio
+    // setupBehavior() will be called from the first image load handler
+  }
 </script> 
