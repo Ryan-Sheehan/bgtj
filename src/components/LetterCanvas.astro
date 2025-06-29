@@ -552,22 +552,23 @@
         const newWidth = parent.offsetWidth;
         if (canvas.width !== newWidth) {
           canvas.width = newWidth;
+          
+          // Only trigger setupBehavior if width actually changed
+          setupBehavior();
+          draw();
         }
-        
-        // Update height using mobile Safari-aware method
-        const newHeight = getMobileSafariViewportHeight();
-        if (canvas.height !== newHeight) {
-          canvas.height = newHeight;
-        }
-        
-        setupBehavior();
-        draw();
       }, 150); // 150ms debounce
     };
 
     // Use ResizeObserver for robust resize handling
     if (canvas && canvas.parentElement) {
-      const resizeObserver = new window.ResizeObserver(handleResize);
+      const resizeObserver = new window.ResizeObserver(entries => {
+        // Only respond to actual width changes
+        const entry = entries[0];
+        if (entry && entry.contentRect.width !== canvas.width) {
+          handleResize();
+        }
+      });
       resizeObserver.observe(canvas.parentElement);
     }
     
@@ -576,14 +577,17 @@
       window.visualViewport.addEventListener('resize', () => {
         if (!canvas) return;
         
+        // Ignore resize events that are likely from scrolling (keyboard, toolbar, etc)
         if (resizeTimeout) clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-          const newHeight = getMobileSafariViewportHeight();
-          if (canvas.height !== newHeight) {
-            canvas.height = newHeight;
+          const parent = canvas.parentElement;
+          const newWidth = parent.offsetWidth;
+          // Only update if width changed significantly
+          if (Math.abs(canvas.width - newWidth) > 10) {
+            canvas.width = newWidth;
+            setupBehavior();
+            draw();
           }
-          setupBehavior();
-          draw();
         }, 100); // Faster response for visual viewport changes
       });
     }
@@ -595,13 +599,14 @@
       
       if (orientationTimeout) clearTimeout(orientationTimeout);
       orientationTimeout = setTimeout(() => {
-        // Update viewport height using mobile Safari-aware method
-        const newHeight = getMobileSafariViewportHeight();
-        if (canvas.height !== newHeight) {
-          canvas.height = newHeight;
+        const parent = canvas.parentElement;
+        const newWidth = parent.offsetWidth;
+        // Only update if width changed significantly
+        if (Math.abs(canvas.width - newWidth) > 10) {
+          canvas.width = newWidth;
+          setupBehavior();
+          draw();
         }
-        setupBehavior();
-        draw();
       }, 300); // 300ms debounce for orientation
     };
     window.addEventListener('orientationchange', handleOrientationChange);
