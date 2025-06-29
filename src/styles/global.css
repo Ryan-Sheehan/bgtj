@@ -14,10 +14,11 @@
   }
 
 :root {
-  --color-text: #18181b;
-  --color-text-rgb: 24,24,27;
-  --color-border: #18181b;
-  --color-bg: #C23A2A;
+  --color-bg: #F1CF6A;
+  --color-bg-rgb: 241, 207, 106;
+  --color-text: #000000;
+  --color-text-rgb: 0, 0, 0;
+  --color-border: #000000;
   --header-height: 4.4rem;
 }
 @media (max-width: 700px) {

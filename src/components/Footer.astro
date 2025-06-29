@@ -105,9 +105,37 @@ const { title = 'Stay Updated', description = 'Get the latest news and updates f
 		box-sizing: border-box !important;
 	}
 	
+	/* Target the actual input element */
+	:global(input[type="email"]) {
+		color: var(--color-text) !important;
+	}
+	
+	:global(input[type="email"]::placeholder),
 	:global([data-supascribe-subscribe] input::placeholder) {
 		color: var(--color-text) !important;
 		opacity: 0.6 !important;
+		-webkit-text-fill-color: var(--color-text) !important;
+	}
+	
+	:global(input[type="email"]::-webkit-input-placeholder),
+	:global([data-supascribe-subscribe] input::-webkit-input-placeholder) {
+		color: var(--color-text) !important;
+		opacity: 0.6 !important;
+		-webkit-text-fill-color: var(--color-text) !important;
+	}
+	
+	:global(input[type="email"]::-moz-placeholder),
+	:global([data-supascribe-subscribe] input::-moz-placeholder) {
+		color: var(--color-text) !important;
+		opacity: 0.6 !important;
+		-webkit-text-fill-color: var(--color-text) !important;
+	}
+	
+	:global(input[type="email"]:-ms-input-placeholder),
+	:global([data-supascribe-subscribe] input:-ms-input-placeholder) {
+		color: var(--color-text) !important;
+		opacity: 0.6 !important;
+		-webkit-text-fill-color: var(--color-text) !important;
 	}
 	
 	:global([data-supascribe-subscribe] button) {
@@ -130,10 +158,6 @@ const { title = 'Stay Updated', description = 'Get the latest news and updates f
 	
 	:global([data-supascribe-subscribe] button:hover) {
 		opacity: 0.8 !important;
-	}
-	
-	:global([data-supascribe-subscribe] *) {
-		color: var(--color-text) !important;
 	}
 	
 	/* Responsive adjustments */
