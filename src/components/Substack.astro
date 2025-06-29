@@ -3,6 +3,7 @@ import '../styles/substack-embed.css';
 ---
 
 <div class="substack-container">
+  <h2 class="newsletter-title">Stay Updated</h2>
   <iframe
     src="https://bgtj.substack.com/embed"
     class="substack-embed"
@@ -71,6 +72,22 @@ import '../styles/substack-embed.css';
     overflow: hidden;
     border-radius: 8px;
     background: var(--background-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .newsletter-title {
+    font-family: 'Smokum', serif;
+    font-size: 4rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    text-align: center;
+    color: var(--color-text);
+    margin: 0;
+    text-transform: uppercase;
   }
 
   .substack-embed {
@@ -78,5 +95,17 @@ import '../styles/substack-embed.css';
     height: 100%;
     border: none;
     overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    .newsletter-title {
+      font-size: 3.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .newsletter-title {
+      font-size: 3rem;
+    }
   }
 </style> 
