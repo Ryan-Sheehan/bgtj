@@ -10,7 +10,7 @@ const storeLink = store?.storeLink;
   <nav class="header-nav">
     <div class="nav-grid">
       <div class="logo-row">
-        <a href="/" class="logo-link" aria-label="Home">
+        <a href="/" class="logo-link" aria-label="Home" data-home-link>
           <img src={Boys.src} alt="Boys" class="header-logo" />
         </a>
       </div>
@@ -23,6 +23,14 @@ const storeLink = store?.storeLink;
       </div>
     </div>
   </nav>
+  <script>
+    // Prevent page reload when clicking logo on home page
+    document.querySelector('[data-home-link]')?.addEventListener('click', (e) => {
+      if (window.location.pathname === '/') {
+        e.preventDefault();
+      }
+    });
+  </script>
   <style>
     .header {
       width: 100%;
