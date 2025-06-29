@@ -155,6 +155,10 @@
   ];
 
   function randomIndex(max) {
+    if (max <= 0) {
+      console.error('Attempted to get random index with max <= 0');
+      return 0;
+    }
     return Math.floor(Math.random() * max);
   }
 
@@ -178,6 +182,11 @@
   let anyImageLoaded = false;
   let fixedViewportHeight = window.innerHeight;
   const imageOpacities = new Map();
+  const letterPositions = [];
+  let lastLayout = null;
+  let lastHovered = { row: null, col: null };
+  let cleanup = () => {};
+  let timers = [];
 
   // Mobile Safari detection and viewport handling
   function isMobileSafari() {
@@ -220,58 +229,67 @@
       const letterHeight = letterWidth * initialAspectRatio;
       const numRows = Math.floor(height / letterHeight);
       
+      // Add vertical padding to accommodate offsets (25% of letter height)
+      const verticalPadding = letterHeight * 0.25;
+      
       canvas.width = width;
-      canvas.height = height;
+      canvas.height = height + (verticalPadding * 2); // Add padding to top and bottom
       
       // CRITICAL: Clear canvas again after setting dimensions to prevent white flash
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Initialize variants with correct number of rows from the start
-      currentVariants = Array.from({ length: numRows }, () =>
-        letters.map((_, col) => randomIndex(letters[col].count))
-      );
+      // Initialize variants and positions
+      initializeVariants(numRows);
       
-      // Draw skeleton immediately to show progressive loading
-      // (aspectRatio will be null initially, but draw() now handles this with initialAspectRatio)
-      aspectRatio = initialAspectRatio; // Set initial aspect ratio so draw() works immediately
+      // Draw initial state with vertical offset to account for padding
+      aspectRatio = initialAspectRatio;
+      ctx.translate(0, verticalPadding); // Shift everything down by padding amount
       draw();
+      ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
     });
   }
 
   // Track individual image loading and opacity for fade-in effect
-  const allImages = letters.map(({ dir, count }) =>
+  const allImages = letters.map(({ dir, count }, letterIndex) =>
     Array.from({ length: count }, (_, i) => {
       const img = new window.Image();
-      img.src = `${lettersPath}/${dir}/${i + 1}.webp`;
-      
-      // Create unique key for this specific image
       const imageKey = `${dir}-${i + 1}`;
       imageOpacities.set(imageKey, 0);
-      
+
+      // Add error handling and logging for image loading
+      img.onerror = () => {
+        console.error(`Failed to load image: ${lettersPath}/${dir}/${i + 1}.webp for letter ${letterIndex} (${dir})`);
+        // Try loading PNG as fallback
+        img.src = `${lettersPath}/${dir}/${i + 1}.png`;
+      };
+
       // Individual image load handler
       const handleImageLoad = () => {
-        // Don't update aspect ratio - keep layout consistent across refreshes
+        console.log(`Loaded image: ${lettersPath}/${dir}/${i + 1}.webp for letter ${letterIndex} (${dir})`);
         if (!anyImageLoaded) {
           anyImageLoaded = true;
-          
-          // Set up interactive behavior now that images are loading
           if (canvasBehaviorSetup) {
             canvasBehaviorSetup();
           }
         }
-        
-        // Always animate fade-in, even for cached images
         animateImageIn(imageKey);
       };
+
+      // Set source after attaching handlers
+      img.src = `${lettersPath}/${dir}/${i + 1}.webp`;
       
+      // For already cached images
       if (img.complete) {
-        // For cached images, delay the animation slightly to prevent all cached images
-        // from starting their animation at exactly the same time
-        setTimeout(() => handleImageLoad(), Math.random() * 100);
+        if (img.naturalWidth === 0) {
+          console.error(`Cached image failed to load: ${lettersPath}/${dir}/${i + 1}.webp for letter ${letterIndex} (${dir})`);
+          img.src = `${lettersPath}/${dir}/${i + 1}.png`;
+        } else {
+          setTimeout(() => handleImageLoad(), Math.random() * 100);
+        }
       } else {
         img.onload = handleImageLoad;
       }
-      
+
       return img;
     })
   );
@@ -287,63 +305,268 @@
     const gap = letterWidth * gapRatio;
     const letterHeight = letterWidth * (aspectRatio || 1.4); // Fallback to 1.4 if not set
     const numRows = Math.floor(height / letterHeight);
-    return { width, height, letterWidth, letterHeight, gap, numRows };
+    const verticalPadding = letterHeight * 0.25; // Match the padding from initialization
+    return { width, height, letterWidth, letterHeight, gap, numRows, verticalPadding };
   }
 
-  // Global function needed by animateImageIn
+  function initializeVariants(numRows) {
+    if (currentVariants.length === 0) {
+      // Only initialize if we haven't already
+      currentVariants = Array.from({ length: numRows }, () =>
+        letters.map((letter, idx) => {
+          const variant = randomIndex(letter.count);
+          console.log(`Initializing variant for letter ${idx} (${letter.dir}): ${variant}/${letter.count-1}`);
+          return variant;
+        })
+      );
+      // Initialize positions array
+      while (letterPositions.length < numRows) {
+        letterPositions.push(
+          letters.map((letter, idx) => {
+            const pos = {
+              offsetX: (Math.random() - 0.5) * 0.8,
+              offsetY: (Math.random() - 0.5) * 0.25,
+              rotation: (Math.random() - 0.5) * Math.PI / 12,
+              scale: 1 + (Math.random() - 0.5) * 0.25
+            };
+            console.log(`Initializing position for letter ${idx} (${letter.dir}):`, pos);
+            return pos;
+          })
+        );
+      }
+    } else if (currentVariants.length < numRows) {
+      // Add new rows if needed
+      const newRows = Array.from({ length: numRows - currentVariants.length }, () =>
+        letters.map((letter, idx) => randomIndex(letter.count))
+      );
+      const newPositions = Array.from({ length: numRows - currentVariants.length }, () =>
+        letters.map((letter, idx) => {
+          const pos = {
+            offsetX: (Math.random() - 0.5) * 0.8,
+            offsetY: (Math.random() - 0.5) * 0.25,
+            rotation: (Math.random() - 0.5) * Math.PI / 12,
+            scale: 1 + (Math.random() - 0.5) * 0.25
+          };
+          console.log(`Initializing position for letter ${idx} (${letter.dir}):`, pos);
+          return pos;
+        })
+      );
+      currentVariants = [...currentVariants, ...newRows];
+      letterPositions.push(...newPositions);
+    } else if (currentVariants.length > numRows) {
+      // Remove extra rows if needed
+      currentVariants = currentVariants.slice(0, numRows);
+      letterPositions.splice(numRows);
+    }
+  }
+
+  function setRandomTimerForLetter(row, col) {
+    const minDelay = 1500;
+    const maxDelay = 3500;
+    const delay = Math.random() * (maxDelay - minDelay) + minDelay;
+    
+    const id = setTimeout(() => {
+      // Safety check for array bounds
+      if (!currentVariants[row] || !letters[col]) {
+        console.warn(`Timer triggered for invalid position: row ${row}, col ${col}`);
+        // Restart timer even if invalid to keep animation going
+        setRandomTimerForLetter(row, col);
+        return;
+      }
+
+      const letter = letters[col];
+      let newVariant;
+      const currentVariant = currentVariants[row][col];
+      
+      // Try up to 3 times to get a different variant
+      for (let i = 0; i < 3; i++) {
+        newVariant = randomIndex(letter.count);
+        if (newVariant !== currentVariant || letter.count === 1) break;
+      }
+      
+      // Update variant
+      currentVariants[row][col] = newVariant;
+      
+      // Update position with new random values
+      if (letterPositions[row]?.[col]) {
+        letterPositions[row][col] = {
+          offsetX: (Math.random() - 0.5) * 0.8,
+          offsetY: (Math.random() - 0.5) * 0.25,
+          rotation: (Math.random() - 0.5) * Math.PI / 12,
+          scale: 1 + (Math.random() - 0.5) * 0.25
+        };
+      }
+
+      // Always trigger draw and set next timer
+      draw();
+      setRandomTimerForLetter(row, col);
+    }, delay);
+    
+    // Store the timer ID
+    if (!timers[row]) timers[row] = [];
+    timers[row][col] = id;
+  }
+
+  function handleMouseMove(e) {
+    if (!(canvas instanceof HTMLCanvasElement)) return;
+    
+    const { letterWidth, gap, letterHeight, numRows } = getLayout();
+    const rect = canvas.getBoundingClientRect();
+    
+    // Get precise mouse coordinates accounting for canvas scaling and DPI
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+    
+    let hoveredCol = null;
+    let hoveredRow = null;
+    
+    // More efficient column detection using direct calculation
+    const rawCol = Math.floor(x / (letterWidth + gap));
+    if (rawCol >= 0 && rawCol < numLetters) {
+      const startX = rawCol * (letterWidth + gap);
+      const endX = startX + letterWidth;
+      if (x >= startX && x < endX) {
+        hoveredCol = rawCol;
+      }
+    }
+    
+    // More efficient row detection using direct calculation
+    const rawRow = Math.floor(y / letterHeight);
+    if (rawRow >= 0 && rawRow < numRows) {
+      const startY = rawRow * letterHeight;
+      const endY = startY + letterHeight;
+      if (y >= startY && y < endY) {
+        hoveredRow = rawRow;
+      }
+    }
+    
+    // Only trigger change if we're over a valid letter and it's different from last hovered
+    if (
+      hoveredRow !== null &&
+      hoveredCol !== null &&
+      hoveredRow >= 0 && hoveredRow < numRows &&
+      hoveredCol >= 0 && hoveredCol < numLetters &&
+      (hoveredRow !== lastHovered.row || hoveredCol !== lastHovered.col)
+    ) {
+      const oldVariant = currentVariants[hoveredRow][hoveredCol];
+      const newVariant = (oldVariant + 1) % letters[hoveredCol].count;
+      currentVariants[hoveredRow][hoveredCol] = newVariant;
+      // Update position when variant changes on hover
+      letterPositions[hoveredRow][hoveredCol] = {
+        offsetX: (Math.random() - 0.5) * 0.8,
+        offsetY: (Math.random() - 0.5) * 0.25,
+        rotation: (Math.random() - 0.5) * Math.PI / 12,
+        scale: 1 + (Math.random() - 0.5) * 0.25
+      };
+      draw();
+    }
+    
+    lastHovered = { row: hoveredRow, col: hoveredCol };
+  }
+
   function draw() {
     if (!ctx || !(canvas instanceof HTMLCanvasElement)) return;
     
-    // Always draw, even before first image loads (use initial aspect ratio)
-    const { width, height, letterWidth, letterHeight, gap, numRows } = getLayout();
+    const { width, height, letterWidth, letterHeight, gap, numRows, verticalPadding } = getLayout();
     
-    // NEVER resize canvas after initial setup - always use clearRect to prevent white flash
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.translate(0, verticalPadding);
     
-    // Draw each position: skeleton fading out as image fades in
     for (let row = 0; row < numRows; row++) {
       for (let col = 0; col < numLetters; col++) {
-        const x = col * (letterWidth + gap);
-        const y = row * letterHeight;
-        
-        // Get current image variant and its opacity
-        let imgOpacity = 0;
-        if (currentVariants[row]) {
-          const variant = currentVariants[row][col];
-          
-          // Ensure variant is within bounds for this column
-          if (variant >= 0 && variant < letters[col].count) {
-            const imageKey = `${letters[col].dir}-${variant + 1}`;
-            imgOpacity = imageOpacities.get(imageKey) || 0;
-          }
+        const letter = letters[col];
+        if (!letter) {
+          console.error(`Missing letter configuration for column ${col}`);
+          continue;
         }
+
+        const baseX = col * (letterWidth + gap);
+        const baseY = row * letterHeight;
+        
+        let imgOpacity = 0;
+        if (!currentVariants[row]) {
+          console.error(`Missing variants for row ${row}`);
+          continue;
+        }
+
+        const variant = currentVariants[row][col];
+        if (variant === undefined) {
+          console.error(`Missing variant for letter ${letter.dir} at row ${row}, col ${col}`);
+          continue;
+        }
+
+        // Validate variant is within bounds
+        if (variant < 0 || variant >= letter.count) {
+          console.error(`Invalid variant ${variant} for letter ${letter.dir} (count: ${letter.count}) at row ${row}, col ${col}`);
+          currentVariants[row][col] = randomIndex(letter.count);
+          continue;
+        }
+
+        const imageKey = `${letter.dir}-${variant + 1}`;
+        imgOpacity = imageOpacities.get(imageKey) || 0;
         
         const skeletonOpacity = 1 - imgOpacity;
+
+        // Get stored position variance with safety checks
+        const pos = letterPositions[row]?.[col];
+        if (!pos) {
+          console.error(`Missing position data for letter ${letter.dir} at row ${row}, col ${col}`);
+          continue;
+        }
+
+        const offsetX = pos.offsetX * gap;
+        const offsetY = pos.offsetY * letterHeight;
+        const rotation = pos.rotation;
+        const scale = pos.scale;
         
-        // Draw skeleton for this position (fades out as image loads)
+        const x = baseX + offsetX;
+        const y = baseY + offsetY;
+        
         if (skeletonOpacity > 0) {
+          ctx.save();
           ctx.globalAlpha = skeletonOpacity;
           ctx.fillStyle = `rgba(255, 255, 255, 0.15)`;
-          
-          // Add slight randomness to make it more dynamic
-          const randomOffset = Math.sin((row + col) * 0.5) * 3;
-          ctx.fillRect(x + randomOffset, y + randomOffset, letterWidth - 2, letterHeight - 2);
+          ctx.translate(x + letterWidth/2, y + letterHeight/2);
+          ctx.rotate(rotation);
+          ctx.scale(scale, scale);
+          ctx.fillRect(-letterWidth/2, -letterHeight/2, letterWidth - 2, letterHeight - 2);
+          ctx.restore();
         }
         
-        // Draw image for this position (fades in as it loads)
-        if (imgOpacity > 0 && currentVariants[row]) {
-          ctx.globalAlpha = imgOpacity;
-          const variant = currentVariants[row][col];
-          // Double check bounds before accessing image
-          if (variant >= 0 && variant < letters[col].count && allImages[col][variant]) {
-            const img = allImages[col][variant];
-            ctx.drawImage(img, x, y, letterWidth, letterHeight);
+        if (imgOpacity > 0) {
+          const imageArray = allImages[col];
+          if (!imageArray) {
+            console.error(`Missing image array for letter ${letter.dir} at column ${col}`);
+            continue;
           }
+
+          const img = imageArray[variant];
+          if (!img) {
+            console.error(`Missing image for letter ${letter.dir} variant ${variant}`);
+            continue;
+          }
+
+          if (!img.complete || img.naturalWidth === 0) {
+            console.warn(`Image not ready for letter ${letter.dir} variant ${variant}`);
+            continue;
+          }
+
+          ctx.save();
+          ctx.globalAlpha = imgOpacity;
+          ctx.translate(x + letterWidth/2, y + letterHeight/2);
+          ctx.rotate(rotation);
+          ctx.scale(scale, scale);
+          ctx.drawImage(img, -letterWidth/2, -letterHeight/2, letterWidth, letterHeight);
+          ctx.restore();
         }
       }
     }
     
-    ctx.globalAlpha = 1; // Reset alpha
+    ctx.restore();
+    ctx.globalAlpha = 1;
   }
 
   // Animate individual image fade-in
@@ -395,57 +618,13 @@
       }
     }
 
-    function handleMouseMove(e) {
-      if (!(canvas instanceof HTMLCanvasElement)) return;
-      
-      const { letterWidth, gap, letterHeight, numRows } = getLayout();
-      const rect = canvas.getBoundingClientRect();
-      
-      // Get precise mouse coordinates accounting for canvas scaling and DPI
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      const x = (e.clientX - rect.left) * scaleX;
-      const y = (e.clientY - rect.top) * scaleY;
-      
-      let hoveredCol = null;
-      let hoveredRow = null;
-      
-      // More efficient column detection using direct calculation
-      const rawCol = Math.floor(x / (letterWidth + gap));
-      if (rawCol >= 0 && rawCol < numLetters) {
-        const startX = rawCol * (letterWidth + gap);
-        const endX = startX + letterWidth;
-        if (x >= startX && x < endX) {
-          hoveredCol = rawCol;
-        }
+    function handleMouseLeave() {
+      lastHovered = { row: null, col: null };
+      // Cancel any pending throttled mouse events
+      if (mouseThrottleTimer) {
+        cancelAnimationFrame(mouseThrottleTimer);
+        mouseThrottleTimer = null;
       }
-      
-      // More efficient row detection using direct calculation
-      const rawRow = Math.floor(y / letterHeight);
-      if (rawRow >= 0 && rawRow < numRows) {
-        const startY = rawRow * letterHeight;
-        const endY = startY + letterHeight;
-        if (y >= startY && y < endY) {
-          hoveredRow = rawRow;
-        }
-      }
-      
-      // Only trigger change if we're over a valid letter and it's different from last hovered
-      if (
-        hoveredRow !== null &&
-        hoveredCol !== null &&
-        hoveredRow >= 0 && hoveredRow < numRows &&
-        hoveredCol >= 0 && hoveredCol < numLetters &&
-        (hoveredRow !== lastHovered.row || hoveredCol !== lastHovered.col)
-      ) {
-        const oldVariant = currentVariants[hoveredRow][hoveredCol];
-        const newVariant = (oldVariant + 1) % letters[hoveredCol].count;
-        currentVariants[hoveredRow][hoveredCol] = newVariant;
-        
-        draw();
-      }
-      
-      lastHovered = { row: hoveredRow, col: hoveredCol };
     }
 
     // Throttled mouse move handler for better performance
@@ -457,49 +636,6 @@
         handleMouseMove(e);
         mouseThrottleTimer = null;
       });
-    }
-
-    function handleMouseLeave() {
-      lastHovered = { row: null, col: null };
-      // Cancel any pending throttled mouse events
-      if (mouseThrottleTimer) {
-        cancelAnimationFrame(mouseThrottleTimer);
-        mouseThrottleTimer = null;
-      }
-    }
-
-    function setRandomTimerForLetter(row, col) {
-      const minDelay = 1500;
-      const maxDelay = 3500;
-      const delay = Math.random() * (maxDelay - minDelay) + minDelay;
-      const id = setTimeout(() => {
-                  let newVariant;
-          do {
-           newVariant = randomIndex(letters[col].count);
-         } while (newVariant === currentVariants[row][col] && letters[col].count > 1);
-        currentVariants[row][col] = newVariant;
-        draw();
-        setRandomTimerForLetter(row, col);
-      }, delay);
-      timers[row][col] = id;
-    }
-
-    function initializeVariants(numRows) {
-      if (currentVariants.length === 0) {
-        // Only initialize if we haven't already
-        currentVariants = Array.from({ length: numRows }, () =>
-          letters.map((_, col) => randomIndex(letters[col].count))
-        );
-      } else if (currentVariants.length < numRows) {
-        // Add new rows if needed
-        const newRows = Array.from({ length: numRows - currentVariants.length }, () =>
-          letters.map((_, col) => randomIndex(letters[col].count))
-        );
-        currentVariants = [...currentVariants, ...newRows];
-      } else if (currentVariants.length > numRows) {
-        // Remove extra rows if needed
-        currentVariants = currentVariants.slice(0, numRows);
-      }
     }
 
     function setupBehavior() {
@@ -524,9 +660,7 @@
         initializeVariants(numRows);
         timers = Array.from({ length: numRows }, () => Array(numLetters).fill(null));
         lastLayout = layout;
-      }
 
-      if (layoutChanged) {
         if (!isMobile()) {
           canvas.addEventListener('mousemove', throttledMouseMove);
           canvas.addEventListener('mouseleave', handleMouseLeave);
@@ -537,6 +671,7 @@
             }
           };
         } else {
+          // Initialize timers for all positions
           for (let row = 0; row < numRows; row++) {
             for (let col = 0; col < numLetters; col++) {
               setRandomTimerForLetter(row, col);
