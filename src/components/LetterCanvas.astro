@@ -84,7 +84,7 @@
   const parent = canvas.parentElement;
   const width = parent.offsetWidth;
   const height = window.innerHeight;
-  const initialAspectRatio = 1.0; // Square skeleton rectangles look better than guessing aspect ratios
+  const initialAspectRatio = 1.5; // Taller skeleton rectangles
   
   // Calculate layout with better initial aspect ratio
   const gapRatio = 0.12;
@@ -122,23 +122,11 @@
       
       // Individual image load handler
       const handleImageLoad = () => {
-        // Update aspect ratio from first loaded image (but don't resize canvas!)
+        // Don't update aspect ratio - keep layout consistent across refreshes
         if (!anyImageLoaded) {
-          aspectRatio = img.naturalHeight / img.naturalWidth;
           anyImageLoaded = true;
           
-          // Recalculate layout with correct aspect ratio, but don't resize canvas
-          const layout = getLayout();
-          const { numRows } = layout;
-          
-          // Only update variants if the number of rows changed significantly
-          if (Math.abs(currentVariants.length - numRows) > 1) {
-            currentVariants = Array.from({ length: numRows }, () =>
-              letters.map((_, col) => randomIndex(letters[col].count))
-            );
-          }
-          
-          // Set up interactive behavior now that we have correct aspect ratio
+          // Set up interactive behavior now that images are loading
           if (canvasBehaviorSetup) {
             canvasBehaviorSetup();
           }
