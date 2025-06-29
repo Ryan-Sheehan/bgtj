@@ -258,18 +258,16 @@
           if (canvasBehaviorSetup) {
             canvasBehaviorSetup();
           }
-          
-          // Set initial image to full opacity immediately
-          imageOpacities.set(imageKey, 1);
-          draw();
-        } else {
-          // Only animate for subsequent loads/changes
-          animateImageIn(imageKey);
         }
+        
+        // Always animate fade-in, even for cached images
+        animateImageIn(imageKey);
       };
       
       if (img.complete) {
-        handleImageLoad();
+        // For cached images, delay the animation slightly to prevent all cached images
+        // from starting their animation at exactly the same time
+        setTimeout(() => handleImageLoad(), Math.random() * 100);
       } else {
         img.onload = handleImageLoad;
       }
