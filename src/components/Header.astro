@@ -2,6 +2,7 @@
 const pathname = Astro.url?.pathname || '';
 import Boys from '../assets/boys.png';
 import { getStore } from '../lib/sanityClient';
+import { Image } from 'astro:assets';
 
 const store = await getStore();
 const storeLink = store?.storeLink;
@@ -11,7 +12,15 @@ const storeLink = store?.storeLink;
     <div class="nav-grid">
       <div class="logo-row">
         <a href="/" class="logo-link" aria-label="Home" data-home-link>
-          <img src={Boys.src} alt="Boys" class="header-logo" />
+          <Image 
+            src={Boys} 
+            alt="Boys" 
+            class="header-logo"
+            width={100}
+            height={67}
+            loading="eager"
+            decoding="sync"
+          />
         </a>
       </div>
       <div class="nav-row">
