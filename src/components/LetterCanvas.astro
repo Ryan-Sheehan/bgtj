@@ -420,11 +420,20 @@
     const handleResize = () => {
       if (resizeTimeout) clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
+        // Update canvas dimensions to match new parent width
+        const parent = canvas.parentElement;
+        const newWidth = parent.offsetWidth;
+        if (canvas.width !== newWidth) {
+          canvas.width = newWidth;
+        }
+        
         // Only update viewport height for significant changes (not Safari UI changes)
         const currentHeight = window.innerHeight;
         if (Math.abs(currentHeight - fixedViewportHeight) > 100) {
           fixedViewportHeight = currentHeight;
+          canvas.height = fixedViewportHeight;
         }
+        
         setupBehavior();
         draw();
       }, 150); // 150ms debounce
