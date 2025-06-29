@@ -80,11 +80,11 @@
 
 
   // Set up canvas dimensions immediately with correct aspect ratio
-  // Use 1.5625 as initial aspect ratio (typical for letter images) to prevent squishing
+  // Use square skeleton rectangles initially, let actual images determine their aspect ratios
   const parent = canvas.parentElement;
   const width = parent.offsetWidth;
   const height = window.innerHeight;
-  const initialAspectRatio = 1.5625; // This will be updated when first image loads, but prevents squishing
+  const initialAspectRatio = 1.0; // Square skeleton rectangles look better than guessing aspect ratios
   
   // Calculate layout with better initial aspect ratio
   const gapRatio = 0.12;
