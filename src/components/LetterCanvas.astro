@@ -224,7 +224,6 @@
   }
 
   // Track individual image loading and opacity for fade-in effect
-
   const allImages = letters.map(({ dir, count }) =>
     Array.from({ length: count }, (_, i) => {
       const img = new window.Image();
@@ -244,10 +243,14 @@
           if (canvasBehaviorSetup) {
             canvasBehaviorSetup();
           }
+          
+          // Set initial image to full opacity immediately
+          imageOpacities.set(imageKey, 1);
+          draw();
+        } else {
+          // Only animate for subsequent loads/changes
+          animateImageIn(imageKey);
         }
-        
-        // Start individual fade-in animation for this image
-        animateImageIn(imageKey);
       };
       
       if (img.complete) {
@@ -259,8 +262,6 @@
       return img;
     })
   );
-
-
 
   function getLayout() {
     if (!canvas) return { width: 0, height: 0, letterWidth: 0, letterHeight: 0, gap: 0, numRows: 0 };
@@ -275,8 +276,6 @@
     const numRows = Math.floor(height / letterHeight);
     return { width, height, letterWidth, letterHeight, gap, numRows };
   }
-
-
 
   // Global function needed by animateImageIn
   function draw() {
@@ -346,8 +345,6 @@
       // Smooth easing (ease-out cubic)
       const eased = 1 - Math.pow(1 - progress, 3);
       imageOpacities.set(imageKey, eased);
-      
-
       
       // Trigger redraw
       draw();
