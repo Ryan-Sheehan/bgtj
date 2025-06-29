@@ -5,7 +5,7 @@
   // Run immediately to prevent white flash on Mobile Safari
   (function() {
     const canvas = document.getElementById('letters-canvas');
-    if (canvas) {
+    if (canvas instanceof HTMLCanvasElement) {
       const ctx = canvas.getContext('2d');
       if (ctx) {
         // Clear immediately with fallback dimensions
@@ -30,7 +30,7 @@
   // Also clear on DOMContentLoaded to catch any late rendering
   document.addEventListener('DOMContentLoaded', function() {
     const canvas = document.getElementById('letters-canvas');
-    if (canvas) {
+    if (canvas instanceof HTMLCanvasElement) {
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.clearRect(0, 0, canvas.width || 1, canvas.height || 1);
@@ -121,7 +121,10 @@
 <script type="module" is:inline>
   // Immediately clear canvas to prevent white flash on Mobile Safari
   const canvas = document.getElementById('letters-canvas');
-  const ctx = canvas?.getContext('2d');
+  if (!(canvas instanceof HTMLCanvasElement)) {
+    throw new Error('Canvas element not found');
+  }
+  const ctx = canvas.getContext('2d');
   
   // CRITICAL: Clear canvas immediately before any other operations
   // This prevents Mobile Safari from showing white background
@@ -264,9 +267,9 @@
   );
 
   function getLayout() {
-    if (!canvas) return { width: 0, height: 0, letterWidth: 0, letterHeight: 0, gap: 0, numRows: 0 };
+    if (!(canvas instanceof HTMLCanvasElement)) return { width: 0, height: 0, letterWidth: 0, letterHeight: 0, gap: 0, numRows: 0 };
     const parent = canvas.parentElement;
-    const width = parent.offsetWidth;
+    const width = parent?.offsetWidth || 0;
     const height = getMobileSafariViewportHeight(); // Use mobile Safari-aware height
     const gapRatio = 0.12;
     const totalGap = (numLetters - 1) * gapRatio;
@@ -279,7 +282,7 @@
 
   // Global function needed by animateImageIn
   function draw() {
-    if (!canvas || !ctx) return;
+    if (!ctx || !(canvas instanceof HTMLCanvasElement)) return;
     
     // Always draw, even before first image loads (use initial aspect ratio)
     const { width, height, letterWidth, letterHeight, gap, numRows } = getLayout();
@@ -376,14 +379,14 @@
     }
 
     function removeDesktopListeners() {
-      if (canvas) {
+      if (canvas instanceof HTMLCanvasElement) {
         canvas.removeEventListener('mousemove', throttledMouseMove);
         canvas.removeEventListener('mouseleave', handleMouseLeave);
       }
     }
 
     function handleMouseMove(e) {
-      if (!canvas) return;
+      if (!(canvas instanceof HTMLCanvasElement)) return;
       
       const { letterWidth, gap, letterHeight, numRows } = getLayout();
       const rect = canvas.getBoundingClientRect();
@@ -490,7 +493,7 @@
     }
 
     function setupBehavior() {
-      if (!canvas) return;
+      if (!(canvas instanceof HTMLCanvasElement)) return;
       
       // Recompute layout and check if it actually changed
       const layout = getLayout();
@@ -518,7 +521,7 @@
           canvas.addEventListener('mousemove', throttledMouseMove);
           canvas.addEventListener('mouseleave', handleMouseLeave);
           cleanup = () => {
-            if (canvas) {
+            if (canvas instanceof HTMLCanvasElement) {
               canvas.removeEventListener('mousemove', throttledMouseMove);
               canvas.removeEventListener('mouseleave', handleMouseLeave);
             }
@@ -540,13 +543,13 @@
     // Debounced resize handling to prevent interference during scroll
     let resizeTimeout = null;
     const handleResize = () => {
-      if (!canvas) return;
+      if (!(canvas instanceof HTMLCanvasElement)) return;
       
       if (resizeTimeout) clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
         // Update canvas dimensions to match new parent width
         const parent = canvas.parentElement;
-        const newWidth = parent.offsetWidth;
+        const newWidth = parent?.offsetWidth || 0;
         if (canvas.width !== newWidth) {
           canvas.width = newWidth;
           
@@ -558,11 +561,11 @@
     };
 
     // Use ResizeObserver for robust resize handling
-    if (canvas && canvas.parentElement) {
+    if (canvas instanceof HTMLCanvasElement && canvas.parentElement) {
       const resizeObserver = new window.ResizeObserver(entries => {
         // Only respond to actual width changes
         const entry = entries[0];
-        if (entry && entry.contentRect.width !== canvas.width) {
+        if (entry && canvas instanceof HTMLCanvasElement && entry.contentRect.width !== canvas.width) {
           handleResize();
         }
       });
@@ -572,13 +575,13 @@
     // Mobile Safari specific: handle visual viewport changes
     if (window.visualViewport && isMobileSafari()) {
       window.visualViewport.addEventListener('resize', () => {
-        if (!canvas) return;
+        if (!(canvas instanceof HTMLCanvasElement)) return;
         
         // Ignore resize events that are likely from scrolling (keyboard, toolbar, etc)
         if (resizeTimeout) clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
           const parent = canvas.parentElement;
-          const newWidth = parent.offsetWidth;
+          const newWidth = parent?.offsetWidth || 0;
           // Only update if width changed significantly
           if (Math.abs(canvas.width - newWidth) > 10) {
             canvas.width = newWidth;
@@ -592,12 +595,12 @@
     // Debounced orientation change handler
     let orientationTimeout = null;
     const handleOrientationChange = () => {
-      if (!canvas) return;
+      if (!(canvas instanceof HTMLCanvasElement)) return;
       
       if (orientationTimeout) clearTimeout(orientationTimeout);
       orientationTimeout = setTimeout(() => {
         const parent = canvas.parentElement;
-        const newWidth = parent.offsetWidth;
+        const newWidth = parent?.offsetWidth || 0;
         // Only update if width changed significantly
         if (Math.abs(canvas.width - newWidth) > 10) {
           canvas.width = newWidth;
