@@ -72,9 +72,7 @@
   canvas.width = width;
   canvas.height = height;
   
-  // Fill with solid red background immediately to prevent blank screen
-  ctx.fillStyle = '#8B0000';
-  ctx.fillRect(0, 0, width, height);
+  // Canvas should be transparent to show CSS background
 
   // Draw skeleton loader immediately (will be updated when first image loads)
   function drawSkeleton() {
@@ -193,9 +191,15 @@
     }
     
     const { width, height, letterWidth, letterHeight, gap, numRows } = getLayout();
-    canvas.width = width;
-    canvas.height = height;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Only resize canvas if dimensions actually changed to prevent unnecessary clearing
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+    } else {
+      // Just clear the existing canvas content (maintains transparency)
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
     
     // Draw each position: skeleton fading out as image fades in
     for (let row = 0; row < numRows; row++) {
