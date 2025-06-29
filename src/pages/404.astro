@@ -1,0 +1,54 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.astro';
+---
+
+<Layout showFooter={false}>
+	<div class="error-container">
+		<div class="error-content">
+			<p>Sorry, we couldn't find that page.</p>
+			<Button href="/" text="Return Home" />
+		</div>
+	</div>
+</Layout>
+
+<style>
+	.error-container {
+		grid-column: 1 / -1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		min-height: calc(100vh - var(--header-height));
+		text-align: center;
+	}
+
+	.error-content {
+		padding-bottom: 5rem;
+	}
+
+	p {
+		font-size: 1.5rem;
+		margin: 1rem 0 2rem;
+	}
+
+	@media (max-width: 768px) {
+		h1 {
+			font-size: 6rem;
+		}
+
+		p {
+			font-size: 1.25rem;
+		}
+	}
+
+	@media (max-width: 480px) {
+		h1 {
+			font-size: 4rem;
+		}
+
+		p {
+			font-size: 1.125rem;
+		}
+	}
+</style>

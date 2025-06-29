@@ -19,11 +19,11 @@
   --color-text: #000000;
   --color-text-rgb: 0, 0, 0;
   --color-border: #000000;
-  --header-height: 4.4rem;
+  --header-height: 10rem;
 }
 @media (max-width: 700px) {
   :root {
-    --header-height: 3.2rem;
+    --header-height: 10rem;
   }
 }
 

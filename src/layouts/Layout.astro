@@ -6,6 +6,12 @@ import { getClient } from '../lib/sanityClient';
 import { settingsQuery } from '../lib/queries';
 import type { Settings } from '../types/sanity.types';
 
+interface Props {
+	showFooter?: boolean;
+}
+
+const { showFooter = true } = Astro.props;
+
 // Fetch settings data
 const client = getClient();
 const settings: Settings | null = await client.fetch(settingsQuery);
@@ -48,7 +54,7 @@ const footerProps = {
 				<slot />
 			</div>
 		</main>
-		<Footer {...footerProps} />
+		{showFooter && <Footer {...footerProps} />}
 		
 		<script src="https://js.supascribe.com/v1/loader/oM707Bo7FLSkPHmbJ3Ecpz2V1IJ3.js" async></script>
 	</body>
