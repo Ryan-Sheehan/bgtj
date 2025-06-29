@@ -123,7 +123,6 @@
         if (!anyImageLoaded) {
           aspectRatio = img.naturalHeight / img.naturalWidth;
           anyImageLoaded = true;
-          console.log('First image loaded, aspect ratio:', aspectRatio);
           
           // Now that we have the correct aspect ratio, set up the canvas properly
           const layout = getLayout();
@@ -133,17 +132,19 @@
           // Re-initialize variants with correct number of rows
           const { numRows } = layout;
           currentVariants = Array.from({ length: numRows }, () =>
-            letters.map((_, col) => randomIndex(allImages[col].length))
+            letters.map((_, col) => randomIndex(letters[col].count))
           );
           
           // Draw initial skeleton
           draw();
           
           // Now set up interactive behavior
-          setupBehavior();
+          if (canvasBehaviorSetup) {
+            canvasBehaviorSetup();
+          }
         }
         
-        console.log('Image loaded:', imageKey);
+
         
         // Start individual fade-in animation for this image
         animateImageIn(imageKey);
@@ -166,7 +167,7 @@
   // Initialize with a reasonable default to prevent errors during image loading
   const defaultRows = Math.floor(window.innerHeight / 100); // Rough estimate
   currentVariants = Array.from({ length: defaultRows }, () =>
-    letters.map((_, col) => randomIndex(allImages[col].length)) // Random variant for each position
+    letters.map((_, col) => randomIndex(letters[col].count)) // Use letter count, not allImages length
   );
 
   function getLayout() {
@@ -182,6 +183,9 @@
     return { width, height, letterWidth, letterHeight, gap, numRows };
   }
 
+
+
+  // Global function needed by animateImageIn
   function draw() {
     // Don't draw until we have the correct aspect ratio
     if (aspectRatio === null) {
@@ -203,12 +207,11 @@
         let imgOpacity = 0;
         if (currentVariants[row]) {
           const variant = currentVariants[row][col];
-          const imageKey = `${letters[col].dir}-${variant + 1}`;
-          imgOpacity = imageOpacities.get(imageKey) || 0;
           
-          // Debug: log first few lookups
-          if (row === 0 && col < 3) {
-            console.log(`Looking for key: ${imageKey}, found opacity: ${imgOpacity}`);
+          // Ensure variant is within bounds for this column
+          if (variant >= 0 && variant < letters[col].count) {
+            const imageKey = `${letters[col].dir}-${variant + 1}`;
+            imgOpacity = imageOpacities.get(imageKey) || 0;
           }
         }
         
@@ -228,8 +231,11 @@
         if (imgOpacity > 0 && currentVariants[row]) {
           ctx.globalAlpha = imgOpacity;
           const variant = currentVariants[row][col];
-          const img = allImages[col][variant];
-          ctx.drawImage(img, x, y, letterWidth, letterHeight);
+          // Double check bounds before accessing image
+          if (variant >= 0 && variant < letters[col].count && allImages[col][variant]) {
+            const img = allImages[col][variant];
+            ctx.drawImage(img, x, y, letterWidth, letterHeight);
+          }
         }
       }
     }
@@ -250,11 +256,7 @@
       const eased = 1 - Math.pow(1 - progress, 3);
       imageOpacities.set(imageKey, eased);
       
-      // Debug: log when animation completes
-      if (progress >= 1) {
-        console.log(`Animation complete for ${imageKey}, final opacity: ${eased}`);
-        console.log('All loaded keys:', Array.from(imageOpacities.keys()).slice(0, 10));
-      }
+
       
       // Trigger redraw
       draw();
@@ -267,8 +269,8 @@
     requestAnimationFrame(animate);
   }
 
-  // Initialize canvas behavior immediately (don't wait for images)
-  initializeCanvasBehavior();
+  // Global setup behavior function that will be accessible to image load handler
+  let canvasBehaviorSetup = null;
   
   function initializeCanvasBehavior() {
     let cleanup = () => {};
@@ -331,8 +333,10 @@
         hoveredCol >= 0 && hoveredCol < numLetters &&
         (hoveredRow !== lastHovered.row || hoveredCol !== lastHovered.col)
       ) {
-        currentVariants[hoveredRow][hoveredCol] =
-          (currentVariants[hoveredRow][hoveredCol] + 1) % allImages[hoveredCol].length;
+        const oldVariant = currentVariants[hoveredRow][hoveredCol];
+        const newVariant = (oldVariant + 1) % letters[hoveredCol].count;
+        currentVariants[hoveredRow][hoveredCol] = newVariant;
+        
         draw();
       }
       
@@ -364,10 +368,10 @@
       const maxDelay = 3500;
       const delay = Math.random() * (maxDelay - minDelay) + minDelay;
       const id = setTimeout(() => {
-        let newVariant;
-        do {
-          newVariant = randomIndex(allImages[col].length);
-        } while (newVariant === currentVariants[row][col] && allImages[col].length > 1);
+                  let newVariant;
+          do {
+           newVariant = randomIndex(letters[col].count);
+         } while (newVariant === currentVariants[row][col] && letters[col].count > 1);
         currentVariants[row][col] = newVariant;
         draw();
         setRandomTimerForLetter(row, col);
@@ -379,12 +383,12 @@
       if (currentVariants.length === 0) {
         // Only initialize if we haven't already
         currentVariants = Array.from({ length: numRows }, () =>
-          letters.map((_, col) => randomIndex(allImages[col].length))
+          letters.map((_, col) => randomIndex(letters[col].count))
         );
       } else if (currentVariants.length < numRows) {
         // Add new rows if needed
         const newRows = Array.from({ length: numRows - currentVariants.length }, () =>
-          letters.map((_, col) => randomIndex(allImages[col].length))
+          letters.map((_, col) => randomIndex(letters[col].count))
         );
         currentVariants = [...currentVariants, ...newRows];
       } else if (currentVariants.length > numRows) {
@@ -471,5 +475,11 @@
 
     // Don't set up behavior until first image loads with correct aspect ratio
     // setupBehavior() will be called from the first image load handler
+    
+    // Make setupBehavior globally accessible
+    canvasBehaviorSetup = setupBehavior;
   }
+  
+  // Initialize canvas behavior immediately (don't wait for images)
+  initializeCanvasBehavior();
 </script> 
