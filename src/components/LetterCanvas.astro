@@ -25,6 +25,9 @@
     /* Mobile Safari specific fixes */
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+    /* Prevent white flash on mobile Safari */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
   
   @media (pointer: fine) {
@@ -63,6 +66,15 @@
     return Math.floor(Math.random() * max);
   }
 
+  // Check if harmonized mode is enabled via URL parameter
+  function shouldUseHarmonizedMode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('harmonized') === 'true';
+  }
+
+  const useHarmonized = shouldUseHarmonizedMode();
+  const lettersPath = useHarmonized ? '/letters-harmonized' : '/letters';
+
   // Extracted colors preserved in src/data/extracted-colors.json for future use
 
   // Initialize canvas immediately to prevent layout shift
@@ -77,13 +89,29 @@
   let fixedViewportHeight = window.innerHeight;
   const imageOpacities = new Map();
 
+  // Mobile Safari detection and viewport handling
+  function isMobileSafari() {
+    const ua = navigator.userAgent;
+    return /iPad|iPhone|iPod/.test(ua) && /Safari/.test(ua) && !/Chrome/.test(ua);
+  }
 
+  function getMobileSafariViewportHeight() {
+    if (!isMobileSafari()) return window.innerHeight;
+    
+    // For mobile Safari, use visual viewport height to account for UI elements
+    if (window.visualViewport) {
+      return window.visualViewport.height;
+    }
+    
+    // Fallback: use innerHeight but account for potential UI changes
+    return window.innerHeight;
+  }
 
   // Set up canvas dimensions immediately with correct aspect ratio
   // Use square skeleton rectangles initially, let actual images determine their aspect ratios
   const parent = canvas.parentElement;
   const width = parent.offsetWidth;
-  const height = window.innerHeight;
+  const height = getMobileSafariViewportHeight();
   const initialAspectRatio = 1.5; // Taller skeleton rectangles
   
   // Calculate layout with better initial aspect ratio
@@ -97,7 +125,8 @@
   canvas.width = width;
   canvas.height = height;
   
-  // Canvas should stay transparent to show CSS background
+  // Ensure canvas is transparent to prevent white flash
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   
   // Initialize variants with correct number of rows from the start
   currentVariants = Array.from({ length: numRows }, () =>
@@ -114,7 +143,7 @@
   const allImages = letters.map(({ dir, count }) =>
     Array.from({ length: count }, (_, i) => {
       const img = new window.Image();
-      img.src = `/letters/${dir}/${i + 1}.webp`;
+      img.src = `${lettersPath}/${dir}/${i + 1}.webp`;
       
       // Create unique key for this specific image
       const imageKey = `${dir}-${i + 1}`;
@@ -151,7 +180,7 @@
   function getLayout() {
     const parent = canvas.parentElement;
     const width = parent.offsetWidth;
-    const height = fixedViewportHeight; // Use fixed height to prevent scroll interference
+    const height = getMobileSafariViewportHeight(); // Use mobile Safari-aware height
     const gapRatio = 0.12;
     const totalGap = (numLetters - 1) * gapRatio;
     const letterWidth = width / (numLetters + totalGap);
@@ -427,11 +456,10 @@
           canvas.width = newWidth;
         }
         
-        // Only update viewport height for significant changes (not Safari UI changes)
-        const currentHeight = window.innerHeight;
-        if (Math.abs(currentHeight - fixedViewportHeight) > 100) {
-          fixedViewportHeight = currentHeight;
-          canvas.height = fixedViewportHeight;
+        // Update height using mobile Safari-aware method
+        const newHeight = getMobileSafariViewportHeight();
+        if (canvas.height !== newHeight) {
+          canvas.height = newHeight;
         }
         
         setupBehavior();
@@ -443,13 +471,31 @@
     const resizeObserver = new window.ResizeObserver(handleResize);
     resizeObserver.observe(canvas.parentElement);
     
+    // Mobile Safari specific: handle visual viewport changes
+    if (window.visualViewport && isMobileSafari()) {
+      window.visualViewport.addEventListener('resize', () => {
+        if (resizeTimeout) clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+          const newHeight = getMobileSafariViewportHeight();
+          if (canvas.height !== newHeight) {
+            canvas.height = newHeight;
+          }
+          setupBehavior();
+          draw();
+        }, 100); // Faster response for visual viewport changes
+      });
+    }
+    
     // Debounced orientation change handler
     let orientationTimeout = null;
     const handleOrientationChange = () => {
       if (orientationTimeout) clearTimeout(orientationTimeout);
       orientationTimeout = setTimeout(() => {
-        // Update viewport height only on actual orientation changes
-        fixedViewportHeight = window.innerHeight;
+        // Update viewport height using mobile Safari-aware method
+        const newHeight = getMobileSafariViewportHeight();
+        if (canvas.height !== newHeight) {
+          canvas.height = newHeight;
+        }
         setupBehavior();
         draw();
       }, 300); // 300ms debounce for orientation
