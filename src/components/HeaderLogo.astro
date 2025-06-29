@@ -1,0 +1,78 @@
+---
+import Boys from '../assets/boys.png';
+import { Image } from 'astro:assets';
+---
+<a href="/" class="logo-link" aria-label="Home" data-home-link>
+  <Image 
+    src={Boys} 
+    alt="Boys" 
+    class="header-logo"
+    width={240}
+    height={161}
+    loading="eager"
+    decoding="sync"
+    id="header-logo-img"
+  />
+</a>
+<script>
+  // Prevent page reload when clicking logo on home page
+  document.querySelector('[data-home-link]')?.addEventListener('click', (e) => {
+    if (window.location.pathname === '/') {
+      e.preventDefault();
+    }
+  });
+
+  let colors = [ '#d25a48','#d4c1b6', '#4c8958', '#8e4abb'];
+
+  function updateRingColors() {
+    const logoImg = document.getElementById('header-logo-img');
+    if (logoImg) {
+      logoImg.style.setProperty('--logo-ring0', colors[0]);
+      logoImg.style.setProperty('--logo-ring1', colors[1]);
+      logoImg.style.setProperty('--logo-ring2', colors[2]);
+      logoImg.style.setProperty('--logo-ring3', colors[3]);
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    updateRingColors();
+    const logo = document.querySelector('[data-home-link]');
+    if (logo) {
+      logo.addEventListener('mouseenter', () => {
+        const first = colors.shift();
+        if (first !== undefined) colors.push(first);
+        updateRingColors();
+      });
+    }
+  });
+</script>
+<style>
+.logo-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.header-logo {
+  width: 100%;
+  max-width: 180px;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+  box-sizing: border-box;
+  --logo-ring0: #d4c1b6;
+  --logo-ring1: #d25a48;
+  --logo-ring2: #4c8958;
+  --logo-ring3: #8e4abb;
+  box-shadow:
+    inset 0 0 0 3px var(--logo-ring0),
+    inset 0 0 0 7px var(--logo-ring1),
+    0 0 0 3px var(--logo-ring3),
+    0 0 0 6px var(--logo-ring2),
+    0 0 0 7px rgba(var(--color-text-rgb), 1);
+  transition:
+    --logo-ring0 0.3s,
+    --logo-ring1 0.3s,
+    --logo-ring2 0.3s,
+    --logo-ring3 0.3s;
+}
+</style> 
