@@ -51,10 +51,9 @@
     overflow-x: hidden;
     grid-column: 1 / 16;
     cursor: default;
-    /* Ensure transparent background - no white flashes */
-    background: transparent !important;
-    /* Mobile Safari specific: force transparent background */
-    background-color: transparent !important;
+    /* Match page background to prevent white flash */
+    background: var(--color-bg) !important;
+    background-color: var(--color-bg) !important;
     /* Optimize for crisp rendering */
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
