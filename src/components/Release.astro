@@ -22,7 +22,7 @@ const artworkUrl = artwork ? urlFor(artwork).width(800).height(800).fit('crop').
     <div class="untitled-embed" set:html={embedCode}></div>
   ) : (
     <div class="release-content">
-      <h1 class="release-title">{title}</h1>
+      <h2 class="release-title">{title}</h2>
       {artwork && (
         <div class="artwork-container">
           <Image 
@@ -70,22 +70,6 @@ const artworkUrl = artwork ? urlFor(artwork).width(800).height(800).fit('crop').
   width: 100%;
 }
 
-.release-title {
-  font-family: 'Smokum', serif;
-  font-size: 4rem;
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  text-align: center;
-  color: var(--color-text);
-  margin: 0;
-  text-transform: uppercase;
-  background: linear-gradient(135deg, var(--color-text) 0%, var(--color-text) 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  position: relative;
-}
-
 .artwork-container {
   position: relative;
   width: 100%;
@@ -128,10 +112,6 @@ const artworkUrl = artwork ? urlFor(artwork).width(800).height(800).fit('crop').
     padding: 0 1rem;
   }
   
-  .release-title {
-    font-size: 3rem;
-  }
-  
   .artwork-container {
     max-width: 400px;
   }
@@ -145,10 +125,6 @@ const artworkUrl = artwork ? urlFor(artwork).width(800).height(800).fit('crop').
   .release-content {
     gap: 1.5rem;
     padding: 0 0.5rem;
-  }
-  
-  .release-title {
-    font-size: 2.5rem;
   }
   
   .artwork-container {
