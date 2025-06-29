@@ -49,7 +49,7 @@
     min-height: 100vh; /* Prevent footer flash during loading */
     box-sizing: border-box;
     overflow-x: hidden;
-    grid-column: 1 / 16;
+    grid-column: 1 / -1;
     cursor: default;
     /* Match page background to prevent white flash */
     background: var(--color-bg) !important;
@@ -75,6 +75,10 @@
     /* Force hardware acceleration and prevent white flash */
     -webkit-transform-style: preserve-3d;
     transform-style: preserve-3d;
+    /* Prevent overflow on initial render */
+    position: relative;
+    left: 0;
+    right: 0;
   }
   
   /* Mobile Safari specific overrides */
@@ -195,35 +199,43 @@
 
   // Set up canvas dimensions immediately with correct aspect ratio
   // Use square skeleton rectangles initially, let actual images determine their aspect ratios
-  if (canvas && ctx) {
-    const parent = canvas.parentElement;
-    const width = parent.offsetWidth;
-    const height = getMobileSafariViewportHeight();
-    const initialAspectRatio = 1.5; // Taller skeleton rectangles
-    
-    // Calculate layout with better initial aspect ratio
-    const gapRatio = 0.12;
-    const totalGap = (letters.length - 1) * gapRatio;
-    const letterWidth = width / (letters.length + totalGap);
-    const gap = letterWidth * gapRatio;
-    const letterHeight = letterWidth * initialAspectRatio;
-    const numRows = Math.floor(height / letterHeight);
-    
-    canvas.width = width;
-    canvas.height = height;
-    
-    // CRITICAL: Clear canvas again after setting dimensions to prevent white flash
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Initialize variants with correct number of rows from the start
-    currentVariants = Array.from({ length: numRows }, () =>
-      letters.map((_, col) => randomIndex(letters[col].count))
-    );
-    
-    // Draw skeleton immediately to show progressive loading
-    // (aspectRatio will be null initially, but draw() now handles this with initialAspectRatio)
-    aspectRatio = initialAspectRatio; // Set initial aspect ratio so draw() works immediately
-    draw();
+  if (canvas instanceof HTMLCanvasElement && ctx) {
+    // Wait for next frame to ensure parent layout is settled
+    requestAnimationFrame(() => {
+      const parent = canvas.parentElement;
+      if (!parent) return;
+      
+      // Force a reflow to ensure we get the correct width
+      parent.offsetHeight;
+      
+      const width = parent.offsetWidth;
+      const height = getMobileSafariViewportHeight();
+      const initialAspectRatio = 1.5; // Taller skeleton rectangles
+      
+      // Calculate layout with better initial aspect ratio
+      const gapRatio = 0.12;
+      const totalGap = (letters.length - 1) * gapRatio;
+      const letterWidth = width / (letters.length + totalGap);
+      const gap = letterWidth * gapRatio;
+      const letterHeight = letterWidth * initialAspectRatio;
+      const numRows = Math.floor(height / letterHeight);
+      
+      canvas.width = width;
+      canvas.height = height;
+      
+      // CRITICAL: Clear canvas again after setting dimensions to prevent white flash
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Initialize variants with correct number of rows from the start
+      currentVariants = Array.from({ length: numRows }, () =>
+        letters.map((_, col) => randomIndex(letters[col].count))
+      );
+      
+      // Draw skeleton immediately to show progressive loading
+      // (aspectRatio will be null initially, but draw() now handles this with initialAspectRatio)
+      aspectRatio = initialAspectRatio; // Set initial aspect ratio so draw() works immediately
+      draw();
+    });
   }
 
   // Track individual image loading and opacity for fade-in effect
