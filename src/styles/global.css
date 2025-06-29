@@ -31,6 +31,7 @@ a, button, .transition-element {
 }
 
 a {
+  color: inherit;
   color: var(--color-text) !important;
   text-decoration: none !important;
 }
