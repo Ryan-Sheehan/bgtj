@@ -1,6 +1,7 @@
 ---
 import { urlFor } from '../lib/sanityClient';
 import type { Release } from '../types/sanity.types';
+import { Image } from 'astro:assets';
 
 export interface Props {
   title?: string;
@@ -11,6 +12,9 @@ export interface Props {
 }
 
 const { title, artwork, linkAggregator, type, embedCode } = Astro.props;
+
+// Get the artwork URL and dimensions
+const artworkUrl = artwork ? urlFor(artwork).width(800).height(800).fit('crop').url() : '';
 ---
 <div class="release-container">
   {type === 'untitled' && embedCode ? (
@@ -20,10 +24,13 @@ const { title, artwork, linkAggregator, type, embedCode } = Astro.props;
       <h1 class="release-title">{title}</h1>
       {artwork && (
         <div class="artwork-container">
-          <img 
-            src={urlFor(artwork).width(800).height(800).fit('crop').url()} 
+          <Image 
+            src={artworkUrl}
             alt={title || 'Release artwork'} 
-            class="release-artwork" 
+            class="release-artwork"
+            width={800}
+            height={800}
+            quality="max"
           />
           <div class="artwork-overlay"></div>
         </div>
