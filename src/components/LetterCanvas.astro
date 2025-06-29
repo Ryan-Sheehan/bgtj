@@ -70,48 +70,46 @@
   const ctx = canvas.getContext('2d');
   const numLetters = letters.length;
 
+  // Global variables for canvas behavior (declare early)
+  let currentVariants = [];
+  let aspectRatio = null;
+  let anyImageLoaded = false;
+  let fixedViewportHeight = window.innerHeight;
+  const imageOpacities = new Map();
 
 
-  // Set up canvas dimensions immediately 
+
+  // Set up canvas dimensions immediately with correct aspect ratio
+  // Use 1.5625 as initial aspect ratio (typical for letter images) to prevent squishing
   const parent = canvas.parentElement;
   const width = parent.offsetWidth;
   const height = window.innerHeight;
+  const initialAspectRatio = 1.5625; // This will be updated when first image loads, but prevents squishing
+  
+  // Calculate layout with better initial aspect ratio
+  const gapRatio = 0.12;
+  const totalGap = (letters.length - 1) * gapRatio;
+  const letterWidth = width / (letters.length + totalGap);
+  const gap = letterWidth * gapRatio;
+  const letterHeight = letterWidth * initialAspectRatio;
+  const numRows = Math.floor(height / letterHeight);
+  
   canvas.width = width;
   canvas.height = height;
   
   // Canvas should stay transparent to show CSS background
-
-  // Draw skeleton loader immediately (will be updated when first image loads)
-  function drawSkeleton() {
-    const gapRatio = 0.12;
-    const totalGap = (numLetters - 1) * gapRatio;
-    const letterWidth = width / (numLetters + totalGap);
-    const gap = letterWidth * gapRatio;
-    const letterHeight = letterWidth * 1.4; // Approximate aspect ratio, updated when images load
-    const numRows = Math.floor(height / letterHeight);
-
-    ctx.clearRect(0, 0, width, height);
-    
-    for (let row = 0; row < numRows; row++) {
-      for (let col = 0; col < numLetters; col++) {
-        // Simple subtle gray for skeleton
-        ctx.fillStyle = `rgba(255, 255, 255, 0.15)`; // Very subtle white overlay
-        
-        const x = col * (letterWidth + gap);
-        const y = row * letterHeight;
-        
-        // Add slight randomness to make it more dynamic
-        const randomOffset = Math.sin((row + col) * 0.5) * 3;
-        
-        ctx.fillRect(x + randomOffset, y + randomOffset, letterWidth - 2, letterHeight - 2);
-      }
-    }
-  }
+  
+  // Initialize variants with correct number of rows from the start
+  currentVariants = Array.from({ length: numRows }, () =>
+    letters.map((_, col) => randomIndex(letters[col].count))
+  );
+  
+  // Draw skeleton immediately to show progressive loading
+  // (aspectRatio will be null initially, but draw() now handles this with initialAspectRatio)
+  aspectRatio = initialAspectRatio; // Set initial aspect ratio so draw() works immediately
+  draw();
 
   // Track individual image loading and opacity for fade-in effect
-  const imageOpacities = new Map();
-  let aspectRatio = null; // Will be set when first image loads
-  let anyImageLoaded = false;
 
   const allImages = letters.map(({ dir, count }) =>
     Array.from({ length: count }, (_, i) => {
@@ -124,32 +122,27 @@
       
       // Individual image load handler
       const handleImageLoad = () => {
-        // Update aspect ratio from first loaded image
+        // Update aspect ratio from first loaded image (but don't resize canvas!)
         if (!anyImageLoaded) {
           aspectRatio = img.naturalHeight / img.naturalWidth;
           anyImageLoaded = true;
           
-          // Now that we have the correct aspect ratio, set up the canvas properly
+          // Recalculate layout with correct aspect ratio, but don't resize canvas
           const layout = getLayout();
-          canvas.width = layout.width;
-          canvas.height = layout.height;
-          
-          // Re-initialize variants with correct number of rows
           const { numRows } = layout;
-          currentVariants = Array.from({ length: numRows }, () =>
-            letters.map((_, col) => randomIndex(letters[col].count))
-          );
           
-          // Draw initial skeleton
-          draw();
+          // Only update variants if the number of rows changed significantly
+          if (Math.abs(currentVariants.length - numRows) > 1) {
+            currentVariants = Array.from({ length: numRows }, () =>
+              letters.map((_, col) => randomIndex(letters[col].count))
+            );
+          }
           
-          // Now set up interactive behavior
+          // Set up interactive behavior now that we have correct aspect ratio
           if (canvasBehaviorSetup) {
             canvasBehaviorSetup();
           }
         }
-        
-
         
         // Start individual fade-in animation for this image
         animateImageIn(imageKey);
@@ -165,15 +158,7 @@
     })
   );
 
-  // Global variables for canvas behavior
-  let currentVariants = [];
-  let fixedViewportHeight = window.innerHeight;
-  
-  // Initialize with a reasonable default to prevent errors during image loading
-  const defaultRows = Math.floor(window.innerHeight / 100); // Rough estimate
-  currentVariants = Array.from({ length: defaultRows }, () =>
-    letters.map((_, col) => randomIndex(letters[col].count)) // Use letter count, not allImages length
-  );
+
 
   function getLayout() {
     const parent = canvas.parentElement;
@@ -192,21 +177,11 @@
 
   // Global function needed by animateImageIn
   function draw() {
-    // Don't draw until we have the correct aspect ratio
-    if (aspectRatio === null) {
-      return;
-    }
-    
+    // Always draw, even before first image loads (use initial aspect ratio)
     const { width, height, letterWidth, letterHeight, gap, numRows } = getLayout();
     
-    // Only resize canvas if dimensions actually changed to prevent unnecessary clearing
-    if (canvas.width !== width || canvas.height !== height) {
-      canvas.width = width;
-      canvas.height = height;
-    } else {
-      // Just clear the existing canvas content (maintains transparency)
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
+    // NEVER resize canvas after initial setup - always use clearRect to prevent white flash
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     // Draw each position: skeleton fading out as image fades in
     for (let row = 0; row < numRows; row++) {
