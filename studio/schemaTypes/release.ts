@@ -108,10 +108,12 @@ export default {
     select: {
       type: 'type',
       title: 'title',
+      artwork: 'artwork',
     },
     prepare(value: Record<string, any>) {
       return {
         title: value.type === 'untitled' ? '[untitled] embed' : value.title || 'Release',
+        media: value.artwork || undefined,
       }
     },
   },
