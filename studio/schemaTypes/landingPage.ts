@@ -81,6 +81,44 @@ export default {
             },
           },
         },
+        {
+          type: 'object',
+          name: 'insetImage',
+          title: 'Inset Image',
+          icon: FiHome,
+          fields: [
+            {
+              name: 'image',
+              type: 'image',
+              title: 'Image',
+              description: 'Inset image displayed within page content width',
+              validation: (Rule: Rule) => Rule.required(),
+              options: {
+                hotspot: true,
+              },
+            },
+            {
+              name: 'alt',
+              type: 'string',
+              title: 'Alt Text',
+              description: 'Alternative text for accessibility',
+              validation: (Rule: Rule) => Rule.required(),
+            },
+          ],
+          preview: {
+            select: {
+              media: 'image',
+              title: 'alt',
+            },
+            prepare(value: { media: any; title: string }) {
+              return {
+                title: 'Inset Image',
+                subtitle: value.title || 'No alt text',
+                media: value.media,
+              }
+            },
+          },
+        },
       ],
       validation: (Rule: Rule) =>
         Rule.custom((components: any[]) => {

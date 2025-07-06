@@ -2,6 +2,7 @@
 import LetterCanvas from '../components/LetterCanvas.astro';
 import Layout from '../layouts/Layout.astro';
 import FullBleedImage from '../components/FullBleedImage.astro';
+import InsetImage from '../components/InsetImage.astro';
 import familyUrl from '../assets/family.webp';
 import { getClient, urlFor } from '../lib/sanityClient';
 import { landingPageQuery } from '../lib/queries';
@@ -49,6 +50,19 @@ const components = landingPageData?.components || defaultComponents;
           alt={component.alt || 'Family'} 
         />
       );
+    }
+    
+    if ((component as any)._type === 'insetImage') {
+      // @ts-ignore – insetImage type is not yet present in generated definitions
+      const comp = component as any;
+      const hasValidImage = comp.image?.asset?._ref && 
+                           comp.image.asset._ref.length > 0;
+
+      const imageSrc = hasValidImage
+        ? urlFor(comp.image).width(1200).fit('max').url()
+        : familyUrl.src;
+
+      return <InsetImage src={imageSrc} alt={comp.alt || 'Image'} />;
     }
     
     return null;
