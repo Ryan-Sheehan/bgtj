@@ -1,0 +1,29 @@
+---
+import { getClient } from '../../lib/sanityClient'
+import { postQuery } from '../../lib/queries'
+
+export const prerender = false
+
+const { slug } = Astro.params as { slug: string }
+
+// Fetch the draft version of the post using the preview token so unpublished changes are visible.
+const post = await getClient(import.meta.env.SANITY_STUDIO_PREVIEW_TOKEN).fetch(postQuery, { slug })
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{post?.title ?? 'Preview'}</title>
+  </head>
+  <body>
+    {post ? (
+      <article>
+        <h1>{post.title}</h1>
+        <!-- For now, simply dump the raw GROQ result. You can replace this with Portable Text rendering later. -->
+        <pre>{JSON.stringify(post, null, 2)}</pre>
+      </article>
+    ) : (
+      <p>Preview not found for slug: {slug}</p>
+    )}
+  </body>
+</html>
