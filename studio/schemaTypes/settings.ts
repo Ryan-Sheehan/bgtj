@@ -10,6 +10,7 @@ export default {
       name: 'mailingList',
       type: 'object',
       title: 'Mailing List',
+      options: { collapsible: true, collapsed: true },
       fields: [
         {
           name: 'title',
