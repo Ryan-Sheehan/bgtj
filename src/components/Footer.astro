@@ -185,7 +185,6 @@ const { title = 'Stay Updated', description = 'Get the latest news and updates f
 		gap: 2rem;
 		padding: 1rem 2.5vw 1rem 2.5vw;
 		margin: 4rem -2.5vw 0 -2.5vw;
-		background: #d4c1b6;
 		border-top: 1px solid rgba(var(--color-text-rgb), 1);
 	}
 	
@@ -230,6 +229,12 @@ const { title = 'Stay Updated', description = 'Get the latest news and updates f
 	@media (max-width: 480px) {
 		.footer {
 			margin-top: 2rem;
+			overflow: hidden;
+			min-height: 0;
+		}
+		.footer-content {
+			overflow: hidden;
+			min-height: 0;
 		}
 	}
 </style> 
