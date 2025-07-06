@@ -31,10 +31,20 @@ export const settingsQuery = `*[_type == "settings" && _id == "settings"][0] {
   mailingList {
     title,
     description
+  },
+  meta {
+    title,
+    description,
+    image
   }
 }`
 
 export const landingPageQuery = `*[_type == "landingPage" && _id == "landingPage"][0] {
+  meta {
+    title,
+    description,
+    image
+  },
   components[] {
     _type,
     enabled,
