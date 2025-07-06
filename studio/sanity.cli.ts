@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import {defineCliConfig} from 'sanity/cli'
 import { requireEnv } from './utils/requireEnv'
 
