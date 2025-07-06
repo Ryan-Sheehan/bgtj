@@ -1,5 +1,5 @@
 import { FiTag } from 'react-icons/fi'
-import type { Rule } from 'sanity'
+import type { Rule } from '@sanity/types'
 
 export default {
   name: 'meta',
