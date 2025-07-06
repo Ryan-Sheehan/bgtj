@@ -3,13 +3,14 @@ import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './schemaTypes'
 import deskStructure from './deskStructure'
+import { requireEnv } from './utils/requireEnv'
 
 export default defineConfig({
   name: 'default',
   title: 'Boys Go To Jupiter',
 
-  projectId: 'h4tf03ho',
-  dataset: 'production',
+  projectId: requireEnv('SANITY_PROJECT_ID'),
+  dataset: requireEnv('SANITY_DATASET'),
 
   plugins: [
     structureTool({ structure: deskStructure }),
