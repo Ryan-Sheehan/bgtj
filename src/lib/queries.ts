@@ -36,6 +36,12 @@ export const settingsQuery = `*[_type == "settings" && _id == "settings"][0] {
     title,
     description,
     image
+  },
+  socialLinks {
+    instagram,
+    tiktok,
+    youtube,
+    spotify
   }
 }`
 

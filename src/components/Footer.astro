@@ -1,10 +1,13 @@
 ---
+import type { SocialLinks } from '../types/sanity.types';
+
 export interface Props {
 	title?: string;
 	description?: string;
+	socialLinks?: SocialLinks;
 }
 
-const { title = 'Stay Updated', description = 'Get the latest news and updates from Boys Go To Jupiter' } = Astro.props;
+const { title = 'Stay Updated', description = 'Get the latest news and updates from Boys Go To Jupiter', socialLinks } = Astro.props;
 ---
 
 <footer class="footer">
@@ -14,6 +17,22 @@ const { title = 'Stay Updated', description = 'Get the latest news and updates f
 			<p class="newsletter-description">{description}</p>
 			<div data-supascribe-embed-id="572252791967" data-supascribe-subscribe class="newsletter-embed"></div>
 		</div>
+		{socialLinks && (
+			<ul class="social-links">
+				{socialLinks?.instagram && (
+					<li><a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer">IG</a></li>
+				)}
+				{socialLinks?.tiktok && (
+					<li><a href={socialLinks.tiktok} target="_blank" rel="noopener noreferrer">Tiktok</a></li>
+				)}
+				{socialLinks?.spotify && (
+					<li><a href={socialLinks.spotify} target="_blank" rel="noopener noreferrer">Spotify</a></li>
+				)}
+				{socialLinks?.youtube && (
+					<li><a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer">Youtube</a></li>
+				)}
+			</ul>
+		)}
 	</div>
 </footer>
 
@@ -22,7 +41,7 @@ const { title = 'Stay Updated', description = 'Get the latest news and updates f
 	.footer {
 		background: var(--color-bg);
 		margin-top: 4rem;
-		padding: 4rem 0 5rem 0;
+		padding: 4rem 0 0 0;
 		overflow: visible;
 	}
 	
@@ -36,6 +55,7 @@ const { title = 'Stay Updated', description = 'Get the latest news and updates f
 	}
 	
 	.footer-newsletter {
+		grid-row: 1;
 		grid-column: 2 / -2;
 		display: flex;
 		flex-direction: column;
@@ -153,6 +173,34 @@ const { title = 'Stay Updated', description = 'Get the latest news and updates f
 	:global([data-supascribe-subscribe] button:hover) {
 		opacity: 0.8 !important;
 	}
+
+	.social-links {
+		grid-row: 2;
+		grid-column: 1 / -1;
+		display: grid;
+		grid-template-columns: repeat(14, 1fr);
+		list-style: none;
+		display: flex;
+		justify-content: flex-end;
+		gap: 2rem;
+		padding: 1rem 2.5vw 1rem 2.5vw;
+		margin: 4rem -2.5vw 0 -2.5vw;
+		background: #d4c1b6;
+		border-top: 1px solid rgba(var(--color-text-rgb), 1);
+	}
+	
+	.social-links a {
+		color: var(--color-text);
+		text-decoration: none;
+		font-family: 'Courier Prime', monospace;
+		text-transform: uppercase;
+	}
+	
+	.social-links a:hover {
+	  background-color: rgba(var(--color-text-rgb, 24,24,27), 0.2);
+      color: var(--color-text);
+      opacity: 1;
+	}
 	
 	/* Responsive adjustments */
 	@media (max-width: 412px) {
@@ -169,6 +217,13 @@ const { title = 'Stay Updated', description = 'Get the latest news and updates f
 
 		.newsletter-embed {
 			max-width: none;
+		}
+
+		.social-links {
+			grid-column: 1 / -1;
+			grid-row: 2;
+			justify-content: center;
+			gap: 2rem;
 		}
 	}
 	

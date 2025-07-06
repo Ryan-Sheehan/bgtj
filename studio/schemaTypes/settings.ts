@@ -30,6 +30,13 @@ export default {
       ],
     },
     {
+      name: 'socialLinks',
+      type: 'socialLinks',
+      title: 'Social Links',
+      description: 'Links to your social media profiles',
+      options: { collapsible: true, collapsed: true },
+    },
+    {
       name: 'meta',
       type: 'meta',
       title: 'Global Meta',

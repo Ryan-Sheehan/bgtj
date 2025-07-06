@@ -24,7 +24,8 @@ const mailingListDescription = settings?.mailingList?.description;
 // Create footer props object with only defined values
 const footerProps = {
 	...(mailingListTitle && { title: mailingListTitle }),
-	...(mailingListDescription && { description: mailingListDescription })
+	...(mailingListDescription && { description: mailingListDescription }),
+	...(settings?.socialLinks && { socialLinks: settings.socialLinks })
 };
 
 const title = effectivePageMeta?.title ?? settingsMeta.title ?? 'Boys Go To Jupiter';
