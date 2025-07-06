@@ -6,6 +6,10 @@ export default {
   type: 'object',
   title: 'Meta',
   icon: FiTag,
+  options: {
+    collapsible: true,
+    collapsed: true
+  },
   fields: [
     {
       name: 'title',
