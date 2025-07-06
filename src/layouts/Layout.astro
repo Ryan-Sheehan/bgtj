@@ -2,19 +2,23 @@
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { getClient } from '../lib/sanityClient';
+import { getClient, urlFor } from '../lib/sanityClient';
 import { settingsQuery } from '../lib/queries';
-import type { Settings } from '../types/sanity.types';
+import type { Meta, Settings } from '../types/sanity.types';
 
-interface Props {
+export interface Props {
 	showFooter?: boolean;
+	meta?: Meta;
+	children?: any;
 }
 
-const { showFooter = true } = Astro.props;
+const { showFooter = true, meta: pageMeta } = Astro.props as Props;
+const effectivePageMeta: Meta | undefined = pageMeta;
 
 // Fetch settings data
 const client = getClient();
 const settings: Settings | null = await client.fetch(settingsQuery);
+const settingsMeta = settings?.meta ?? {} as Meta;
 const mailingListTitle = settings?.mailingList?.title;
 const mailingListDescription = settings?.mailingList?.description;
 
@@ -23,6 +27,11 @@ const footerProps = {
 	...(mailingListTitle && { title: mailingListTitle }),
 	...(mailingListDescription && { description: mailingListDescription })
 };
+
+const title = effectivePageMeta?.title ?? settingsMeta.title ?? 'Boys Go To Jupiter';
+const description = effectivePageMeta?.description ?? settingsMeta.description ?? 'they say the boys went to jupiter / to drown out the noise of the universe / packed a couple sandwiches and piled in the car / for the boys boys boys it was just the start...';
+const metaImageRef = effectivePageMeta?.image ?? settingsMeta.image;
+const imageUrl = metaImageRef ? urlFor(metaImageRef).width(1200).height(630).fit('crop').url() : '/og-image.jpg';
 ---
 <!doctype html>
 <html lang="en">
@@ -34,18 +43,18 @@ const footerProps = {
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Smokum&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-		<title>Boys Go To Jupiter</title>
-		<meta name="description" content="they say the boys went to jupiter / to drown out the noise of the universe / packed a couple sandwiches and piled in the car / for the boys boys boys it was just the start..." />
+		<title>{title}</title>
+		<meta name="description" content={description} />
 		<!-- Open Graph -->
-		<meta property="og:title" content="Boys Go To Jupiter" />
-		<meta property="og:description" content="they say the boys went to jupiter / to drown out the noise of the universe / packed a couple sandwiches and piled in the car / for the boys boys boys it was just the start..." />
-		<meta property="og:image" content="/og-image.jpg" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={imageUrl} />
 		<meta property="og:type" content="website" />
 		<!-- Twitter -->
 		<meta name="twitter:card" content="summary_large_image" />
-		<meta name="twitter:title" content="Boys Go To Jupiter" />
-		<meta name="twitter:description" content="they say the boys went to jupiter / to drown out the noise of the universe / packed a couple sandwiches and piled in the car / for the boys boys boys it was just the start..." />
-		<meta name="twitter:image" content="/og-image.jpg" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={imageUrl} />
 	</head>
 	<body>
 		<Header />

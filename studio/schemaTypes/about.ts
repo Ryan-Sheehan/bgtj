@@ -35,6 +35,13 @@ export default {
       ],
       validation: (rule: Rule) => rule.required()
     },
+    {
+      name: 'meta',
+      type: 'meta',
+      title: 'Page Meta',
+      description: 'Override global SEO metadata for this page',
+      options: { collapsible: true, collapsed: true },
+    },
   ],
   preview: {
     prepare() {

@@ -1,5 +1,5 @@
 import { FiHome } from 'react-icons/fi'
-import type { Rule } from 'sanity'
+import type { Rule } from '@sanity/types'
 
 export default {
   name: 'landingPage',
@@ -7,6 +7,13 @@ export default {
   title: 'Landing Page',
   icon: FiHome,
   fields: [
+    {
+      name: 'meta',
+      type: 'meta',
+      title: 'Page Meta',
+      description: 'Override global SEO metadata for this page',
+      options: { collapsible: true, collapsed: true },
+    },
     {
       name: 'components',
       type: 'array',

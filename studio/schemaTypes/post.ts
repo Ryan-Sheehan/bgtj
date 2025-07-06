@@ -24,6 +24,13 @@ export default {
         type: 'array',
         of: [{ type: 'block' }],
       },
+      {
+        name: 'meta',
+        type: 'meta',
+        title: 'Page Meta',
+        description: 'Override global SEO metadata for this post',
+        options: { collapsible: true, collapsed: true },
+      },
     ],
     preview: {
       select: { title: 'title', slug: 'slug.current' },

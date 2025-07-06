@@ -5,5 +5,6 @@ import about from './about'
 import store from './store'
 import settings from './settings'
 import landingPage from './landingPage'
+import meta from './meta'
 
-export const schemaTypes = [post, video, release, about, store, settings, landingPage]
+export const schemaTypes = [post, video, release, about, store, settings, landingPage, meta]

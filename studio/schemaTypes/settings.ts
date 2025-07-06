@@ -27,6 +27,13 @@ export default {
         },
       ],
     },
+    {
+      name: 'meta',
+      type: 'meta',
+      title: 'Global Meta',
+      description: 'Default SEO metadata applied site-wide',
+      options: { collapsible: true, collapsed: true },
+    },
   ],
   preview: {
     prepare() {

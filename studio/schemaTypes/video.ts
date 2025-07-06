@@ -1,4 +1,4 @@
-import type { Rule } from 'sanity'
+import type { Rule } from '@sanity/types'
 import { FiPlayCircle } from 'react-icons/fi'
 
 export default {

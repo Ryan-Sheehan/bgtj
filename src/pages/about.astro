@@ -3,10 +3,10 @@ import Layout from '../layouts/Layout.astro';
 import { getClient } from '../lib/sanityClient';
 import AboutContent from '../components/AboutContent.tsx';
 
-const about = await getClient().fetch(`*[_type == 'about'][0]{content}`);
+const about = await getClient().fetch(`*[_type == 'about'][0]{content, meta}`);
 ---
 
-<Layout>
+<Layout {...(about?.meta ? { meta: about.meta } : {})}>
   <div class="about-container">
     <div class="about-content">
       <AboutContent value={about?.content} />
