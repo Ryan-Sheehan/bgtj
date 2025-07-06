@@ -4,7 +4,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { getClient, urlFor } from '../lib/sanityClient';
 import { settingsQuery } from '../lib/queries';
-import type { Meta, Settings } from '../types/sanity.types';
+import type { Meta } from '../types/sanity.types';
 
 interface Props {
 	showFooter?: boolean;
@@ -16,15 +16,17 @@ const effectivePageMeta: Meta | undefined = pageMeta;
 
 // Fetch settings data
 const client = getClient();
-const settings: Settings | null = await client.fetch(settingsQuery);
+const settings: any = await client.fetch(settingsQuery);
 const settingsMeta = settings?.meta ?? {} as Meta;
 const mailingListTitle = settings?.mailingList?.title;
 const mailingListDescription = settings?.mailingList?.description;
+const socialLinks = settings?.socialLinks;
 
 // Create footer props object with only defined values
 const footerProps = {
 	...(mailingListTitle && { title: mailingListTitle }),
-	...(mailingListDescription && { description: mailingListDescription })
+	...(mailingListDescription && { description: mailingListDescription }),
+	...(socialLinks && { socialLinks })
 };
 
 const title = effectivePageMeta?.title ?? settingsMeta.title ?? 'Boys Go To Jupiter';

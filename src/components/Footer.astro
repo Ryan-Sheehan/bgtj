@@ -2,9 +2,19 @@
 export interface Props {
 	title?: string;
 	description?: string;
+	socialLinks?: {
+		instagram?: string;
+		tiktok?: string;
+		youtube?: string;
+		spotify?: string;
+	};
 }
 
-const { title = 'Stay Updated', description = 'Get the latest news and updates from Boys Go To Jupiter' } = Astro.props;
+const {
+	title = 'Stay Updated',
+	description = 'Get the latest news and updates from Boys Go To Jupiter',
+	socialLinks = {},
+} = Astro.props as Props;
 ---
 
 <footer class="footer">
@@ -13,6 +23,22 @@ const { title = 'Stay Updated', description = 'Get the latest news and updates f
 			<h3 class="newsletter-title">{title}</h3>
 			<p class="newsletter-description">{description}</p>
 			<div data-supascribe-embed-id="572252791967" data-supascribe-subscribe class="newsletter-embed"></div>
+			{(socialLinks.instagram || socialLinks.tiktok || socialLinks.spotify || socialLinks.youtube) && (
+				<ul class="social-links">
+					{socialLinks.instagram && (
+						<li><a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer">IG</a></li>
+					)}
+					{socialLinks.tiktok && (
+						<li><a href={socialLinks.tiktok} target="_blank" rel="noopener noreferrer">Tiktok</a></li>
+					)}
+					{socialLinks.spotify && (
+						<li><a href={socialLinks.spotify} target="_blank" rel="noopener noreferrer">Spotify</a></li>
+					)}
+					{socialLinks.youtube && (
+						<li><a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer">Youtube</a></li>
+					)}
+				</ul>
+			)}
 		</div>
 	</div>
 </footer>
@@ -177,5 +203,24 @@ const { title = 'Stay Updated', description = 'Get the latest news and updates f
 			margin-top: 2rem;
 			padding: 2rem 0;
 		}
+	}
+	
+	.social-links {
+		list-style: none;
+		display: flex;
+		gap: 1rem;
+		padding: 0;
+		margin: 1rem 0 0 0;
+	}
+	
+	.social-links a {
+		color: var(--color-text);
+		text-decoration: none;
+		font-family: 'Courier Prime', monospace;
+		text-transform: uppercase;
+	}
+	
+	.social-links a:hover {
+		opacity: 0.8;
 	}
 </style> 
