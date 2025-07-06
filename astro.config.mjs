@@ -22,16 +22,16 @@ export default defineConfig({
         cache: true,
         includePublic: false, // Don't process public files to avoid deployment timeouts
         logStats: true,
-        exclude: ['_astro/**'],
+        exclude: ['_astro/**', 'letters/**'],
       }),
       
-      // Bundle analysis
-      visualizer({
+      // Bundle analysis (optional)
+      ...(process.env.ANALYZE ? [visualizer({
         filename: 'dist/stats.html',
         open: false,
         gzipSize: true,
         brotliSize: true,
-      }),
+      })] : []),
       
       // Development tools
       checker({

@@ -7,6 +7,7 @@ import familyUrl from '../assets/family.webp';
 import { getClient, urlFor } from '../lib/sanityClient';
 import { landingPageQuery } from '../lib/queries';
 import type { LandingPage } from '../types/sanity.types';
+import type { InsetImageBlock } from '../types/custom-sanity';
 
 // Fetch landing page data
 const client = getClient();
@@ -53,8 +54,7 @@ const components = landingPageData?.components || defaultComponents;
     }
     
     if ((component as any)._type === 'insetImage') {
-      // @ts-ignore – insetImage type is not yet present in generated definitions
-      const comp = component as any;
+      const comp = component as unknown as InsetImageBlock;
       const hasValidImage = comp.image?.asset?._ref && 
                            comp.image.asset._ref.length > 0;
 

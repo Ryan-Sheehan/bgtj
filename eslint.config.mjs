@@ -22,7 +22,7 @@ export default [
     rules: {
       // Basic rules
       'no-unused-vars': 'warn',
-      'no-console': 'warn',
+      'no-console': 'error',
       
       // TypeScript rules
       '@typescript-eslint/no-unused-vars': 'warn',

@@ -69,7 +69,9 @@ const imageUrl = metaImageRef ? urlFor(metaImageRef).width(1200).height(630).fit
 		
 		<script>
 			import { signature } from '../lib/signature.js';
-			signature();
+			if (import.meta.env.DEV) {
+				signature();
+			}
 		</script>
 	</body>
 </html>
