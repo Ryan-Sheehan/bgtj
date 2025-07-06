@@ -65,6 +65,11 @@ const imageUrl = metaImageRef ? urlFor(metaImageRef).width(1200).height(630).fit
 		{showFooter && <Footer {...footerProps} />}
 		
 		<script is:inline src="https://js.supascribe.com/v1/loader/oM707Bo7FLSkPHmbJ3Ecpz2V1IJ3.js" async></script>
+		
+		<script>
+			import { signature } from '../lib/signature.js';
+			signature();
+		</script>
 	</body>
 </html>
 
