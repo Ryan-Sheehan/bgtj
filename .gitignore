@@ -29,3 +29,4 @@ pnpm-debug.log*
 # ESLint cache
 .eslintcache
 .vercel
+.env*.local
