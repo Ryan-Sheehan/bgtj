@@ -6,10 +6,9 @@ import { getClient, urlFor } from '../lib/sanityClient';
 import { settingsQuery } from '../lib/queries';
 import type { Meta, Settings } from '../types/sanity.types';
 
-export interface Props {
+interface Props {
 	showFooter?: boolean;
 	meta?: Meta;
-	children?: any;
 }
 
 const { showFooter = true, meta: pageMeta } = Astro.props as Props;
