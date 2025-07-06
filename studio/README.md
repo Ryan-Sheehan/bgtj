@@ -1,12 +1,49 @@
-# Sanity Clean Content Studio
+# Boys Go To Jupiter – Sanity Studio
 
-Congratulations, you have now installed the Sanity Content Studio, an open-source real-time content editing environment connected to the Sanity backend.
+This folder contains the content editing studio for https://boysgotojupiter.band. It is powered by **Sanity v3** and controls all site content (landing page, releases, videos, shows, settings, etc.).
 
-Now you can do the following things:
+## Local Development
 
-- [Read "getting started" in the docs](https://www.sanity.io/docs/introduction/getting-started?utm_source=readme)
-- [Join the community Slack](https://slack.sanity.io/?utm_source=readme)
-- [Extend and build plugins](https://www.sanity.io/docs/content-studio/extending?utm_source=readme)
+```bash
+# install dependencies
+cd studio
+npm install
+
+# start the studio
+pm run dev   # http://localhost:3333
+```
+
+## TypeScript Types
+
+After updating schemas, regenerate types consumed by the Astro front-end:
+
+```bash
+# from the repository root
+npm run types
+```
+
+## Deployment (Vercel)
+
+The Studio is deployed as a separate Vercel project and served at:
+
+```
+https://admin.boysgotojupiter.band
+```
+
+Key settings (already committed):
+
+| Setting          | Value         | Source                 |
+| ---------------- | ------------- | ---------------------- |
+| Root directory   | `studio`      | Vercel project setting |
+| Build command    | `npm run build` | `studio/package.json`  |
+| Output directory | `dist`        | `studio/vercel.json`   |
+
+No environment variables are required for the static build.
+
+### Optional
+If you need authenticated features (e.g. querying drafts in Vision), add:
+
+- `SANITY_AUTH_TOKEN` – a **read** or **write** token from your Sanity project
 
 ## CORS configuration for deployment
 
