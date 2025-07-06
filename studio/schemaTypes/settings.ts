@@ -10,6 +10,7 @@ export default {
       name: 'mailingList',
       type: 'object',
       title: 'Mailing List',
+      description: 'Configure the newsletter signup section shown on your site.',
       options: { collapsible: true, collapsed: true },
       fields: [
         {
