@@ -10,7 +10,7 @@ cd studio
 npm install
 
 # start the studio
-pm run dev   # http://localhost:3333
+npm run dev   # http://localhost:3333
 ```
 
 ## TypeScript Types
