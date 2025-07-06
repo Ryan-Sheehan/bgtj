@@ -1,0 +1,31 @@
+---
+export interface Props {
+  src: string | { src: string };
+  alt?: string;
+}
+const { src, alt = '' } = Astro.props;
+---
+<figure class="inset-image-wrapper">
+  <img
+    src={typeof src === 'string' ? src : src.src}
+    alt={alt}
+    class="inset-image"
+    loading="lazy"
+    decoding="async"
+  />
+</figure>
+<style>
+.inset-image-wrapper {
+  margin: 2rem auto;
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+}
+
+.inset-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+</style>
