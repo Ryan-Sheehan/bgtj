@@ -9,8 +9,8 @@ export default defineConfig({
   name: 'default',
   title: 'Boys Go To Jupiter',
 
-  projectId: requireEnv('SANITY_PROJECT_ID'),
-  dataset: requireEnv('SANITY_DATASET'),
+  projectId: requireEnv('SANITY_STUDIO_PROJECT_ID'),
+  dataset: requireEnv('SANITY_STUDIO_DATASET'),
 
   plugins: [
     structureTool({ structure: deskStructure }),
