@@ -19,6 +19,7 @@ export type LandingPage = {
   _createdAt: string
   _updatedAt: string
   _rev: string
+  meta?: Meta
   components?: Array<
     | {
         enabled?: boolean
@@ -56,6 +57,7 @@ export type Settings = {
     title?: string
     description?: string
   }
+  meta?: Meta
 }
 
 export type Store = {
@@ -107,6 +109,7 @@ export type About = {
         _key: string
       }
   >
+  meta?: Meta
 }
 
 export type Release = {
@@ -173,6 +176,25 @@ export type Post = {
     _type: 'block'
     _key: string
   }>
+  meta?: Meta
+}
+
+export type Meta = {
+  _type: 'meta'
+  title?: string
+  description?: string
+  image?: {
+    asset?: {
+      _ref: string
+      _type: 'reference'
+      _weak?: boolean
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
+    }
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
 }
 
 export type SanityImagePaletteSwatch = {
@@ -301,6 +323,7 @@ export type AllSanitySchemaTypes =
   | Release
   | Video
   | Post
+  | Meta
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions

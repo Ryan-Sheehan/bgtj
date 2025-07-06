@@ -4,23 +4,21 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { getClient, urlFor } from '../lib/sanityClient';
 import { settingsQuery } from '../lib/queries';
-import type { Settings } from '../types/sanity.types';
+import type { Meta, Settings } from '../types/sanity.types';
 
-interface Props {
+export interface Props {
 	showFooter?: boolean;
-  meta?: {
-    title?: string;
-    description?: string;
-    image?: any;
-  };
+	meta?: Meta;
+	children?: any;
 }
 
-const { showFooter = true, meta: pageMeta = {} } = Astro.props;
+const { showFooter = true, meta: pageMeta } = Astro.props as Props;
+const effectivePageMeta: Meta | undefined = pageMeta;
 
 // Fetch settings data
 const client = getClient();
 const settings: Settings | null = await client.fetch(settingsQuery);
-const settingsMeta = (settings as any)?.meta || {};
+const settingsMeta = settings?.meta ?? {} as Meta;
 const mailingListTitle = settings?.mailingList?.title;
 const mailingListDescription = settings?.mailingList?.description;
 
@@ -30,9 +28,9 @@ const footerProps = {
 	...(mailingListDescription && { description: mailingListDescription })
 };
 
-const title = pageMeta.title || settingsMeta.title || 'Boys Go To Jupiter';
-const description = pageMeta.description || settingsMeta.description || 'they say the boys went to jupiter / to drown out the noise of the universe / packed a couple sandwiches and piled in the car / for the boys boys boys it was just the start...';
-const metaImageRef = pageMeta.image || settingsMeta.image;
+const title = effectivePageMeta?.title ?? settingsMeta.title ?? 'Boys Go To Jupiter';
+const description = effectivePageMeta?.description ?? settingsMeta.description ?? 'they say the boys went to jupiter / to drown out the noise of the universe / packed a couple sandwiches and piled in the car / for the boys boys boys it was just the start...';
+const metaImageRef = effectivePageMeta?.image ?? settingsMeta.image;
 const imageUrl = metaImageRef ? urlFor(metaImageRef).width(1200).height(630).fit('crop').url() : '/og-image.jpg';
 ---
 <!doctype html>

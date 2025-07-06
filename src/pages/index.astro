@@ -24,7 +24,7 @@ const defaultComponents: NonNullable<LandingPage['components']> = [
 const components = landingPageData?.components || defaultComponents;
 ---
 
-<Layout meta={(landingPageData as any)?.meta}>
+<Layout {...(landingPageData?.meta ? { meta: landingPageData.meta } : {})}>
 	  {components.map((component) => {
     if (component._type === 'letterCanvas') {
       // Only render if enabled (default true)

@@ -6,7 +6,7 @@ import AboutContent from '../components/AboutContent.tsx';
 const about = await getClient().fetch(`*[_type == 'about'][0]{content, meta}`);
 ---
 
-<Layout meta={(about as any)?.meta}>
+<Layout {...(about?.meta ? { meta: about.meta } : {})}>
   <div class="about-container">
     <div class="about-content">
       <AboutContent value={about?.content} />
