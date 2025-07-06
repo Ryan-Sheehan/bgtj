@@ -156,7 +156,6 @@
 
   function randomIndex(max) {
     if (max <= 0) {
-      console.error('Attempted to get random index with max <= 0');
       return 0;
     }
     return Math.floor(Math.random() * max);
@@ -256,16 +255,14 @@
       const imageKey = `${dir}-${i + 1}`;
       imageOpacities.set(imageKey, 0);
 
-      // Add error handling and logging for image loading
+      // Add error handling for image loading
       img.onerror = () => {
-        console.error(`Failed to load image: ${lettersPath}/${dir}/${i + 1}.webp for letter ${letterIndex} (${dir})`);
         // Try loading PNG as fallback
         img.src = `${lettersPath}/${dir}/${i + 1}.png`;
       };
 
       // Individual image load handler
       const handleImageLoad = () => {
-        console.log(`Loaded image: ${lettersPath}/${dir}/${i + 1}.webp for letter ${letterIndex} (${dir})`);
         if (!anyImageLoaded) {
           anyImageLoaded = true;
           if (canvasBehaviorSetup) {
@@ -281,7 +278,6 @@
       // For already cached images
       if (img.complete) {
         if (img.naturalWidth === 0) {
-          console.error(`Cached image failed to load: ${lettersPath}/${dir}/${i + 1}.webp for letter ${letterIndex} (${dir})`);
           img.src = `${lettersPath}/${dir}/${i + 1}.png`;
         } else {
           setTimeout(() => handleImageLoad(), Math.random() * 100);
@@ -315,7 +311,6 @@
       currentVariants = Array.from({ length: numRows }, () =>
         letters.map((letter, idx) => {
           const variant = randomIndex(letter.count);
-          console.log(`Initializing variant for letter ${idx} (${letter.dir}): ${variant}/${letter.count-1}`);
           return variant;
         })
       );
@@ -329,7 +324,6 @@
               rotation: (Math.random() - 0.5) * Math.PI / 12,
               scale: 1 + (Math.random() - 0.5) * 0.25
             };
-            console.log(`Initializing position for letter ${idx} (${letter.dir}):`, pos);
             return pos;
           })
         );
@@ -347,7 +341,6 @@
             rotation: (Math.random() - 0.5) * Math.PI / 12,
             scale: 1 + (Math.random() - 0.5) * 0.25
           };
-          console.log(`Initializing position for letter ${idx} (${letter.dir}):`, pos);
           return pos;
         })
       );
@@ -368,7 +361,6 @@
     const id = setTimeout(() => {
       // Safety check for array bounds
       if (!currentVariants[row] || !letters[col]) {
-        console.warn(`Timer triggered for invalid position: row ${row}, col ${col}`);
         // Restart timer even if invalid to keep animation going
         setRandomTimerForLetter(row, col);
         return;
@@ -479,7 +471,6 @@
       for (let col = 0; col < numLetters; col++) {
         const letter = letters[col];
         if (!letter) {
-          console.error(`Missing letter configuration for column ${col}`);
           continue;
         }
 
@@ -488,19 +479,16 @@
         
         let imgOpacity = 0;
         if (!currentVariants[row]) {
-          console.error(`Missing variants for row ${row}`);
           continue;
         }
 
         const variant = currentVariants[row][col];
         if (variant === undefined) {
-          console.error(`Missing variant for letter ${letter.dir} at row ${row}, col ${col}`);
           continue;
         }
 
         // Validate variant is within bounds
         if (variant < 0 || variant >= letter.count) {
-          console.error(`Invalid variant ${variant} for letter ${letter.dir} (count: ${letter.count}) at row ${row}, col ${col}`);
           currentVariants[row][col] = randomIndex(letter.count);
           continue;
         }
@@ -513,7 +501,6 @@
         // Get stored position variance with safety checks
         const pos = letterPositions[row]?.[col];
         if (!pos) {
-          console.error(`Missing position data for letter ${letter.dir} at row ${row}, col ${col}`);
           continue;
         }
 
@@ -539,18 +526,15 @@
         if (imgOpacity > 0) {
           const imageArray = allImages[col];
           if (!imageArray) {
-            console.error(`Missing image array for letter ${letter.dir} at column ${col}`);
             continue;
           }
 
           const img = imageArray[variant];
           if (!img) {
-            console.error(`Missing image for letter ${letter.dir} variant ${variant}`);
             continue;
           }
 
           if (!img.complete || img.naturalWidth === 0) {
-            console.warn(`Image not ready for letter ${letter.dir} variant ${variant}`);
             continue;
           }
 
