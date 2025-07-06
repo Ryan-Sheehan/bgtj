@@ -4,15 +4,15 @@ import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './schemaTypes'
 import deskStructure from './deskStructure'
 
-const projectId = import.meta.env.VITE_SANITY_STUDIO_PROJECT_ID
-const dataset = import.meta.env.VITE_SANITY_STUDIO_DATASET
+const projectId = import.meta.env.SANITY_STUDIO_PROJECT_ID
+const dataset = import.meta.env.SANITY_STUDIO_DATASET
 
 if (!projectId) {
-  throw new Error('Missing VITE_SANITY_STUDIO_PROJECT_ID environment variable')
+  throw new Error('Missing SANITY_STUDIO_PROJECT_ID environment variable')
 }
 
 if (!dataset) {
-  throw new Error('Missing VITE_SANITY_STUDIO_DATASET environment variable')
+  throw new Error('Missing SANITY_STUDIO_DATASET environment variable')
 }
 
 export default defineConfig({
