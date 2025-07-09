@@ -58,4 +58,11 @@ export const landingPageQuery = `*[_type == "landingPage" && _id == "landingPage
     alt
   }
 }`
+
+export const productsQuery = `*[_type == "product"] | order(orderRank) {
+  _id,
+  title,
+  photo,
+  externalLink
+}`
   

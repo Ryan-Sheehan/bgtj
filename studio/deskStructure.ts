@@ -39,15 +39,14 @@ export default (S: StructureBuilder) =>
             .documentId('about')
             .title('About')
         ),
-      S.listItem()
-        .title('Store')
-        .icon(FiShoppingBag)
-        .child(
-          S.document()
-            .schemaType('store')
-            .documentId('store')
-            .title('Store')
-        ),
+      // Replace Store single-document with orderable Products list
+      orderableDocumentListDeskItem({
+        type: 'product',
+        title: 'Shop Products',
+        icon: FiShoppingBag,
+        S,
+        context: S.context,
+      }),
       S.listItem()
         .title('Settings')
         .icon(FiSettings)
