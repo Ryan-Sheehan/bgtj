@@ -2,13 +2,14 @@
 import Layout from '../layouts/Layout.astro';
 import { getClient, urlFor } from '../lib/sanityClient';
 import { productsQuery } from '../lib/queries';
+import type { Product } from '../types/product';
 
-const products: any[] = await getClient().fetch(productsQuery);
+const products: Product[] = await getClient().fetch(productsQuery);
 ---
 
 <Layout>
   <ul class="products-list">
-    {products.map((product: any) => {
+    {products.map((product: Product) => {
       const imageUrl = product.photo ? urlFor(product.photo).width(800).height(800).fit('crop').url() : '';
       return (
         <li class="product-item">
