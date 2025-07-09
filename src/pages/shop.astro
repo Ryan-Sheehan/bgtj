@@ -1,0 +1,68 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getClient, urlFor } from '../lib/sanityClient';
+import { productsQuery } from '../lib/queries';
+import type { Product } from '../types/product';
+
+const products: Product[] = await getClient().fetch(productsQuery);
+---
+
+<Layout>
+  <div class="products-list">
+    {products.map((product: Product) => {
+      const imageUrl = product.photo ? urlFor(product.photo).width(800).height(800).fit('crop').url() : '';
+      return (
+        <div class="product-item">
+          <a href={product.externalLink} target="_blank" rel="noopener noreferrer">
+            {imageUrl && <img src={imageUrl} alt={product.title} class="product-image" loading="lazy" />}
+            <h2 class="product-title">{product.title}</h2>
+          </a>
+        </div>
+      );
+    })}
+  </div>
+</Layout>
+
+<style>
+.products-list {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  gap: 2rem;
+  width: 100%;
+  padding: 3rem 0;
+  margin: 0;
+  list-style: none;
+}
+
+.product-item {
+  grid-column: span 7;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  text-align: center;
+}
+
+.product-item a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.product-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+  border-radius: 16px;
+}
+
+.product-title {
+  margin-top: 1rem;
+}
+
+@media (max-width: 700px) {
+  .product-item {
+    grid-column: 1 / -1;
+  }
+}
+</style>

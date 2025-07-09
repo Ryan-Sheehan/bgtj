@@ -7,5 +7,6 @@ import settings from './settings'
 import landingPage from './landingPage'
 import meta from './meta'
 import socialLinks from './socialLinks'
+import product from './product'
 
-export const schemaTypes = [post, video, release, about, store, settings, landingPage, meta, socialLinks]
+export const schemaTypes = [post, video, release, about, store, settings, landingPage, meta, socialLinks, product]

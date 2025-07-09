@@ -1,10 +1,7 @@
 ---
 import HeaderLogo from './HeaderLogo.astro';
 const pathname = Astro.url?.pathname || '';
-import { getStore } from '../lib/sanityClient';
-
-const store = await getStore();
-const storeLink = store?.storeLink;
+// Removed old store fetch; shop route is now internal
 ---
 <header class="header">
   <nav class="header-nav">
@@ -16,7 +13,7 @@ const storeLink = store?.storeLink;
         <a href="/music" class={pathname.startsWith('/music') ? 'active nav-link nav-music' : 'nav-link nav-music'}>music</a>
         <a href="/shows" class={pathname.startsWith('/shows') ? 'active nav-link nav-shows' : 'nav-link nav-shows'}>shows</a>
         <a href="/videos" class={pathname.startsWith('/videos') ? 'active nav-link nav-videos' : 'nav-link nav-videos'}>videos</a>
-        {storeLink && <a href={storeLink} class={pathname.startsWith('/store') ? 'active nav-link nav-store' : 'nav-link nav-store'}>store</a>}
+        <a href="/shop" class={pathname.startsWith('/shop') ? 'active nav-link nav-shop' : 'nav-link nav-shop'}>shop</a>
         <a href="/about" class={pathname.startsWith('/about') ? 'active nav-link nav-about' : 'nav-link nav-about'}>about</a>
       </div>
     </div>
