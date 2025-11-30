@@ -27,8 +27,8 @@ const products: Product[] = await getClient().fetch(productsQuery);
 .products-list {
   display: grid;
   grid-column: 1 / -1;
-  grid-template-columns: subgrid;
-  gap: 2rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
   width: 100%;
   padding: 3rem 0;
   margin: 0;
@@ -36,10 +36,8 @@ const products: Product[] = await getClient().fetch(productsQuery);
 }
 
 .product-item {
-  grid-column: span 7;
   width: 100%;
   min-width: 0;
-  max-width: 100%;
   text-align: center;
 }
 
@@ -53,16 +51,28 @@ const products: Product[] = await getClient().fetch(productsQuery);
   aspect-ratio: 1 / 1;
   object-fit: cover;
   display: block;
-  border-radius: 16px;
+  border-radius: 12px;
 }
 
 .product-title {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
+  font-family: 'Courier Prime', monospace;
+  font-size: 1rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
 }
 
-@media (max-width: 700px) {
-  .product-item {
-    grid-column: 1 / -1;
+@media (min-width: 900px) {
+  .products-list {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
+
+@media (min-width: 1200px) {
+  .products-list {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 </style>
